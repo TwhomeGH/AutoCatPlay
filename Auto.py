@@ -378,9 +378,7 @@ while True:
 
                 Gold=get_xy("Gold2.png","驗收")
                 if Gold:
-                    #兩次程式切換
                     click(Gold)
-                    time.sleep(1)
                 
                 Next=get_xy("GetMore.png","下一步")
                 if Next:
