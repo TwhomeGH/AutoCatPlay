@@ -8,25 +8,29 @@ import win32gui #窗口范範圍捕抓
 import random
 from CatFeed import GetItem
 
-#import threading as Th #線程
-
 #項目位置
 ProjectPath=os.path.dirname(os.path.abspath(__file__))
 print('Project >>',ProjectPath)
 
-WebFile=None#"C:/Users/u01/Desktop/NuclearWeb/Status.txt"
-ESCCount=0
+WebFile="C:/Users/u01/Desktop/NuclearWeb/Status.txt" #用於指定任意位置存放統計結果
+
 Delay=3 #檢測延遲
-AutoNext=0 #自動下一步
-AutoMode=[0,3,[0,0]] #用於確定是否需要自動接替
-BackCount=0
-AutoPlay=0
+
+AutoMode=[0,3,0,0] #用於確定是否需要自動接替
+# [0]自動加碼多多狀態
+# [1]接替倒數
+# [2]戰鬥AI狀態
+# [3]自動下一步
+
+ESCCount=0 #退出按鍵計數
 Region=(0,0,0,0) #查找位置
-CaptureF=0
+CaptureF=0 #第幾張圖
+
+HourCount=0
 
 ItemGet=GetItem()
 
-TestAddState=[
+MSearchAddState=[
     '1.png', '2.png', '3.png', '4.png', '5.png', 
     '6.png', '7.png', '8.png', '9.png', '10.png',
     ]
@@ -136,7 +140,7 @@ def press(key):
     key 接收按下的按鍵
     鍵盤按鍵接收用
     """
-    global BackCount,AutoPlay,AutoMode
+    global ESCCount,AutoMode
     
     if AutoMode[0]==1:
         AutoMode[0]=0
@@ -145,17 +149,17 @@ def press(key):
         
     
     if key == keyboard.Key.esc:
-            BackCount+=1
-            if BackCount>=5:
+            ESCCount+=1
+            if ESCCount>=5:
                 print(ItemGet.Result())
                 print('結束進程')
                 os._exit(0)
     if key == keyboard.KeyCode.from_char('g'):
-        if AutoPlay==0:
-            AutoPlay=1
+        if AutoMode[2]==0:
+            AutoMode[2]=1
             print("啟用自動戰鬥簡易操作")
         else:
-            AutoPlay=0
+            AutoMode[2]=0
             print("關閉自動戰鬥")
     if key == keyboard.KeyCode.from_char('h'):
         print(pyautogui.position())        
@@ -168,7 +172,6 @@ def move(x,y):
         AutoMode[0]=0
     if AutoMode[1]<10:
         AutoMode[1]+=1
-    #print(x,y)
 
 #鍵盤按鍵接收
 listen=keyboard.Listener(on_press=press)
@@ -179,17 +182,12 @@ listen2.start()
 
 
 while True:
-    BackCount=0
+    ESCCount=0
     Position=pyautogui.position()
-    PositionXY=[Position.x,Position.y]
-    print(f"當前位置:{PositionXY} 延遲:{Delay} 狀態:{AutoMode[0]}")
-    print(f"自動:{60-AutoNext} 接替於:{AutoMode[1]}")
+    print(f"當前位置:{Position} 延遲:{Delay} 狀態:{AutoMode[0]}")
+    print(f"自動下一步:{AutoMode[3]} 接替於:{AutoMode[1]}")
     #LDOperationRecorderWindow 操作錄製窗口
-    #LDPlayerMainFrame 主窗口
-    
-    #winF=win32console.GetConsoleWindow()
-    #print(win32gui.IsIconic(winF),win32gui.IsChild(winF))
-    
+    #LDPlayerMainFrame 主窗口    
     
     AutoMode[1]-=1
     
@@ -198,7 +196,7 @@ while True:
         AutoMode[0]=1
 
     HasRun=get_xy('HasRun.png',"正在遊戲中")    
-    if HasRun and AutoPlay==1:
+    if HasRun and AutoMode[2]==1:
         Shot=get_xy("Play\\Shot3.png","貓咪炮")
         
         if Shot:
@@ -312,11 +310,6 @@ while True:
                     if Addd:
                         click(Addd)
                 
-                if BackCount>=6:
-                    if Base:
-                        BackR=get_xy("Back2.png","返回基地")
-                        click(BackR)
-                    BackCount=0
 
                 if CNext:
                     Delay=1
@@ -324,7 +317,7 @@ while True:
                     if Card:
                         time.sleep(1)
                         OK=get_xy("OK3.png","確認-1")
-                        #if OK:click(OK)
+                        if OK:click(OK)
                     OK2=get_xy("OK3.png","確認-2")
                     if OK2:
                         OK2State=pyautogui.pixelMatchesColor(int(OK2.x),int(OK2.y),(254, 254, 254))
@@ -338,15 +331,16 @@ while True:
                     
                     LevelUP=get_xy("Select\\LevelUP.png","加碼多多等級提升")
                     if LevelUP:click(LevelUP)
-                    AutoNext+=1
-                    if AutoNext>60:
+                    
+                    if AutoMode[3]>0:AutoMode-=1
+                    if AutoMode[3]<30:
                         click(CNext)
                         print("自動下一步")
-                        AutoNext=0
+                        AutoMode[3]=0
                         time.sleep(3)
                     
                     
-                AutoState=MoreSearch(listT=TestAddState,Name="加碼多多 尚未探險")
+                AutoState=MoreSearch(listT=MSearchAddState,Name="加碼多多 尚未探險")
                 if AutoState:
                     click(AutoState)
                     time.sleep(1)
@@ -359,7 +353,7 @@ while True:
                         elif XPRange>70:
                             SetHour=6
 
-                    BackCount+=SetHour
+                    HourCount+=SetHour
                     ItemGet.Hour+=SetHour
                     AutoA1=get_xy(f"Select\\{SetHour}HS.png",f"加碼多多{SetHour}H") 
                     if AutoA1:
@@ -430,18 +424,11 @@ while True:
                 if End:
                     click(End,2)
 
-                # GetItemU1=get_xy('item/ItemUP3.png',"道具提升隊員小")
-                # GetMore2=get_xy("GetMore2.png","窗口存在")   
-                # if GetItemU1:
-                #     print("Yes")
-                #     click(GetItemU1)       
-                # if GetMore2:
-                #     print('True')
-                #GetReward=get_xy("Get.png","領取報酬")
-                #if GetReward:
-                #    click(GetReward,2)    
-                #ItemGet.Rest=False
-                AutoMode[2]=[pyautogui.position().x,pyautogui.position().y] #自動更新位置信息
+                if HourCount>=6:
+                    HourCount=0
+                    BackBaseC=get_xy("Back2.png","每6小時 返回驗收確認")
+                    if BackBaseC:click(BackBaseC)
+                
             else:
                 if Delay<120:
                     Delay+=1
