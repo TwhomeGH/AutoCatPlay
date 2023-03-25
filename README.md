@@ -16,6 +16,7 @@
 * Auto.py  
 <kbd>ESC</kbd> 連續點擊5次以上可以退出進程   
 <kbd>G</kbd> 可以開關 戰鬥AI  
+<kbd>H</kbd> 可以取得鼠標位置(用來確認Region範圍用的)  
 
 * Capture.py  
 <kbd>G</kbd> 設置取樣點-1    
