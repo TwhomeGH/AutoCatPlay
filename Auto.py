@@ -16,6 +16,12 @@ WebFile="C:/Users/u01/Desktop/NuclearWeb/Status.txt" #用於指定任意位置�
 
 Delay=3 #檢測延遲
 
+KeySet={
+    'Exit':keyboard.Key.esc,
+    'Auto':keyboard.KeyCode.from_char('g'),
+    'Point':keyboard.KeyCode.from_char('h')
+    }
+
 AutoMode=[0,3,0,30] #用於確定是否需要自動接替
 # [0]自動加碼多多狀態
 # [1]接替倒數
@@ -147,21 +153,20 @@ def press(key):
     if AutoMode[1]<10:
         AutoMode[1]+=1
         
-    
-    if key == keyboard.Key.esc:
+    if key == KeySet.get('Exit'):
             ESCCount+=1
             if ESCCount>=5:
                 print(ItemGet.Result())
                 print('結束進程')
                 os._exit(0)
-    if key == keyboard.KeyCode.from_char('g'):
+    if key == KeySet.get('Auto'):
         if AutoMode[2]==0:
             AutoMode[2]=1
             print("啟用自動戰鬥簡易操作")
         else:
             AutoMode[2]=0
             print("關閉自動戰鬥")
-    if key == keyboard.KeyCode.from_char('h'):
+    if key == KeySet.get('Point'):
         print(pyautogui.position())        
     
     
