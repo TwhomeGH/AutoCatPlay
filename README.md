@@ -9,16 +9,12 @@
 # 按鍵指南
 
 * Auto.py  
-<kbd>ESC</kbd>
-連續點擊5次以上可以退出進程  
-<kbd>G</kbd>
-可以開關 戰鬥AI  
+    <kbd>ESC</kbd> 連續點擊5次以上可以退出進程  
+    <kbd>G</kbd> 可以開關 戰鬥AI  
 
 * Capture.py  
-<kbd>G</kbd>
-設置取樣點-1  
-<kbd>H</kbd>
-設置取樣點-2
+    <kbd>G</kbd> 設置取樣點-1  
+    <kbd>H</kbd> 設置取樣點-2
 
 > (如果你正在遊戲中 他能識別一些貓 並自動點擊他)  
 > 該功能不完整 只有img/Play裡的貓能識別(待完善)  
@@ -35,7 +31,7 @@
 # 資料夾說明
 
 * Get 用於在得到物品 存下圖片
-這是我打算自動蒐集得到物品樣本用的
+> 這是我打算自動蒐集得到物品樣本用的
 
 * Shot 這是使用Capture截取下來的圖片存儲位置
 * img 主要查找用圖片存放
@@ -47,14 +43,17 @@
 
 ## 可以使用此文件->requirements.txt
 - PyAutoGUI==0.9.53
-- pillow==9.4.0 (PyAutoGUI需要)
-- opencv==4.7.0.42 (PyAutoGUI需要(使用到相似度的部分))
+- pillow==9.4.0 
+> PyAutoGUI需要
+- opencv==4.7.0.42
+> PyAutoGUI需要 使用到相似度的部分
 - PyDirectInput==1.0.4
 - pynput==1.7.6
 - win32gui==221.6
 
 ## 其他可以使用此->Other.txt
-* easyocr==1.6.2(可略過 只有imageT會用到)
+* easyocr==1.6.2
+> 可略過 只有imageT會用到
 
 
 
