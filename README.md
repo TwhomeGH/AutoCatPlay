@@ -59,21 +59,17 @@
 
 # 運行注意事項
 
-* 以下這段代碼 可以去掉
+## 關於WebFile - Auto.py  
 ```
-with open('C:/Users/u01/Desktop/NuclearWeb/Status.txt', 'w') as f:
-    DictR=ItemGet.Range()
-    Range='探險數據不夠統計..'
-    if DictR:
-        Range=f"得到XP:{DictR.get('XP')}% 得到罐頭:{DictR.get('Feed')}%"
-
-    f.write(f"""
-    E1{ItemGet.ResultH()}E2
-    E3{Range}E4
-    """
-    )
+WebFile="C:/Users/u01/Desktop/NuclearWeb/Status.txt"
 ```
-> 這只是我用來寫入到網站根目錄下的一個檔案  
-> 用來給Siri捷徑 訪問網站下的指定檔案 獲取文字內容  
+> 如果沒有打算在自架網站根目錄下寫入一個文字文件  
+> 來方便你從Siri捷徑 來取得內容的話  
+> 可以直接修改成  
+```
+WebFile=None
+```
+> 這會自動略過  
+> 用來給Siri捷徑 訪問網站下的指定檔案 獲取文字內容   
 > 來方便從iPad上查看統計數據
 
