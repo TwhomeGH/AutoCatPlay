@@ -27,12 +27,13 @@
 
 # 運行指南
 * 裝好依賴庫後  
-* 先看運行注意事項 修改Auto.py  
+* 先看運行事項 修改Auto.py  
 * 使用命令行運行以下命令運行主程式  
 
 ```
 python Auto.py
 ```
+
 
 # 運行特性
 
@@ -82,7 +83,7 @@ python Auto.py
 
 
 
-# 運行注意事項
+# 運行事項
 
 ## 運行分辨率信息
 1920x1080 模擬器在視窗最大化下有效  
@@ -103,3 +104,14 @@ WebFile=None
 > 用來給Siri捷徑 訪問網站下的指定檔案 獲取文字內容   
 > 來方便從iPad上查看統計數據
 
+## 關於KeySet - Auto.py
+```
+KeySet={
+    'Exit':keyboard.Key.esc,
+    'Auto':keyboard.KeyCode.from_char('g'),
+    'Point':keyboard.KeyCode.from_char('h')
+}
+```
+
+> 現在你可以設定這個3個按鍵
+> 你想要使用的按鍵了
