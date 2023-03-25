@@ -16,10 +16,10 @@
 
 # 檔案說明
 
-Auto.py 主要程式
-CatFeed.py 統計數據的類配置
-Capture.py 用來截取多張圖片(用於多張查找用)
-imageT.py 這是我當時測試easyocr取得文字用的
+* Auto.py 主要程式
+* CatFeed.py 統計數據的類配置
+* Capture.py 用來截取多張圖片(用於多張查找用)
+* imageT.py 這是我當時測試easyocr取得文字用的
 
 # 資料夾說明
 
@@ -50,19 +50,20 @@ imageT.py 這是我當時測試easyocr取得文字用的
 # 運行注意事項
 
 * 以下這段代碼 可以去掉
-`with open('C:/Users/u01/Desktop/NuclearWeb/Status.txt', 'w') as f:
-        DictR=ItemGet.Range()
-        Range='探險數據不夠統計..'
-        if DictR:
-            Range=f"得到XP:{DictR.get('XP')}% 得到罐頭:{DictR.get('Feed')}%"
+```
+with open('C:/Users/u01/Desktop/NuclearWeb/Status.txt', 'w') as f:
+    DictR=ItemGet.Range()
+    Range='探險數據不夠統計..'
+    if DictR:
+        Range=f"得到XP:{DictR.get('XP')}% 得到罐頭:{DictR.get('Feed')}%"
 
-        f.write(f"""
-        E1{ItemGet.ResultH()}E2
-        E3{Range}E4
-        """
-        )`
-
-這只是我用來寫入到網站根目錄下的一個檔案
-用來給Siri捷徑 訪問網站下的指定檔案 獲取文字內容
+    f.write(f"""
+    E1{ItemGet.ResultH()}E2
+    E3{Range}E4
+    """
+    )
+```
+這只是我用來寫入到網站根目錄下的一個檔案  
+用來給Siri捷徑 訪問網站下的指定檔案 獲取文字內容  
 來方便從iPad上查看統計數據
 
