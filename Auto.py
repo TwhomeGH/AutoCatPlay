@@ -14,6 +14,7 @@ from CatFeed import GetItem
 ProjectPath=os.path.dirname(os.path.abspath(__file__))
 print('Project >>',ProjectPath)
 
+WebFile=None#"C:/Users/u01/Desktop/NuclearWeb/Status.txt"
 ESCCount=0
 Delay=3 #檢測延遲
 AutoNext=0 #自動下一步
@@ -447,17 +448,20 @@ while True:
                 if Delay<120:
                     Delay+=1
                 print("進入節能模式 頻率降低")
-                with open('C:/Users/u01/Desktop/NuclearWeb/Status.txt', 'w') as f:
-                    DictR=ItemGet.Range()
-                    Range='探險數據不夠統計..'
-                    if DictR:
-                        Range=f"得到XP:{DictR.get('XP')}% 得到罐頭:{DictR.get('Feed')}%"
 
-                    f.write(f"""
-                    E1{ItemGet.ResultH()}E2
-                    E3{Range}E4
-                    """
-                    )
+                #用於更新網站根目錄特定檔案的內容
+                if WebFile:
+                    with open(WebFile, 'w') as f:
+                        DictR=ItemGet.Range()
+                        Range='探險數據不夠統計..'
+                        if DictR:
+                            Range=f"得到XP:{DictR.get('XP')}% 得到罐頭:{DictR.get('Feed')}%"
+
+                        f.write(f"""
+                        E1{ItemGet.ResultH()}E2
+                        E3{Range}E4
+                        """
+                        )
 
     #else:
         #if Delay<5:Delay=5
