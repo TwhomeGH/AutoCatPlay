@@ -14,12 +14,12 @@
 # 按鍵指南
 
 * Auto.py  
-<kbd>ESC</kbd> 連續點擊5次以上可以退出進程  
+<kbd>ESC</kbd> 連續點擊5次以上可以退出進程   
 <kbd>G</kbd> 可以開關 戰鬥AI  
 
 * Capture.py  
-<kbd>G</kbd> 設置取樣點-1  
-<kbd>H</kbd> 設置取樣點-2
+<kbd>G</kbd> 設置取樣點-1    
+<kbd>H</kbd> 設置取樣點-2  
 
 > (如果你正在遊戲中 他能識別一些貓 並自動點擊他)  
 > 該功能不完整 只有img/Play裡的貓能識別(待完善)  
