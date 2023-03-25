@@ -332,7 +332,7 @@ while True:
                     LevelUP=get_xy("Select\\LevelUP.png","加碼多多等級提升")
                     if LevelUP:click(LevelUP)
                     
-                    if AutoMode[3]>0:AutoMode-=1
+                    if AutoMode[3]>0:AutoMode[3]-=1
                     if AutoMode[3]==0:
                         click(CNext)
                         print("自動下一步")
