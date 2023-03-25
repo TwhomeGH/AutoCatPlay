@@ -16,7 +16,7 @@ WebFile="C:/Users/u01/Desktop/NuclearWeb/Status.txt" #用於指定任意位置�
 
 Delay=3 #檢測延遲
 
-AutoMode=[0,3,0,0] #用於確定是否需要自動接替
+AutoMode=[0,3,0,30] #用於確定是否需要自動接替
 # [0]自動加碼多多狀態
 # [1]接替倒數
 # [2]戰鬥AI狀態
@@ -333,10 +333,10 @@ while True:
                     if LevelUP:click(LevelUP)
                     
                     if AutoMode[3]>0:AutoMode-=1
-                    if AutoMode[3]<30:
+                    if AutoMode[3]==0:
                         click(CNext)
                         print("自動下一步")
-                        AutoMode[3]=0
+                        AutoMode[3]=30
                         time.sleep(3)
                     
                     
