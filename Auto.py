@@ -385,7 +385,7 @@ while True:
                     click(Next)
                 GetM=get_xy("Get3.png","得到物品")    
                 if GetM:
-                    RG=(GetM.x-500,GetM.y-200,GetM.x+500,GetM.y+200)
+                    RG=(GetM.x-700,GetM.y-400,GetM.x+500,GetM.y+100)
                     FileRoot=f"{ProjectPath}\\Get\{CaptureF}.png"
                     pyautogui.screenshot(region=RG).save(FileRoot)
                     CaptureF+=1
