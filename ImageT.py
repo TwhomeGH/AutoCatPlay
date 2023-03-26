@@ -1,4 +1,3 @@
-import easyocr
 import pyautogui
 import os
 import time
@@ -20,10 +19,14 @@ time.sleep(5)
 E=pyautogui.screenshot()
 E.save(f"{ProjectPath}\\TR.png")
 print(E)
-EOCR=easyocr.Reader(['ch_tra'],gpu=False)
 
-result=EOCR.readtext(f"{ProjectPath}\\TR.png")
-print(result)
+# 以下部分是使用到easyocr的部分
+
+# import easyocr
+# EOCR=easyocr.Reader(['ch_tra'],gpu=False)
+
+# result=EOCR.readtext(f"{ProjectPath}\\TR.png")
+# print(result)
 
 #while True:
     #print(FindW())
