@@ -1,5 +1,5 @@
 pillow==9.4.0
-opencv==4.7.0.42
+opencv_python==4.7.0.72
 PyAutoGUI==0.9.53
 PyDirectInput==1.0.4
 pynput==1.7.6
