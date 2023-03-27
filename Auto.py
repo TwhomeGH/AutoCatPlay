@@ -36,8 +36,10 @@ AutoMode=[0,3,0,30,4] #用於確定是否需要自動接替
 # [3]自動下一步
 # [4] 設定是否使用縮放比例
 
+AutoC=0
+
 ESCCount=0 #退出按鍵計數
-Region=(0,0,0,0) #查找位置
+Region=None #查找位置
 CaptureF=0 #第幾張圖
 
 HourCount=0
@@ -413,23 +415,9 @@ while True:
             #'Cat':[get_xy('Play\\Wall.png',"基本牆"),None,75]
             # [0] 查找對象 [1] 可出擊顏色 [2] 價錢
             Cannon_Fodder={
-                'Cat':[get_xy('Play\\Cat.png',"小貓",regionS=Region),(245, 233, 205),75],
+                'Cat':[get_xy('Play\\Cat.png',"小貓",regionS=Region),(151, 151, 148),75],
                 'BigCat':[get_xy('Play\\BigCat.png',"大狂小貓",regionS=Region),(153, 154, 156),75]
             }
-
-            Wall={
-                'Wall':[get_xy('Play\\Wall.png',"基本牆",regionS=Region),(255, 255, 255),150],
-                'BigWall':[get_xy('Play\\BigWall.png',"大狂牆",regionS=Region),(255, 255, 255)],
-                'JumpCat':[get_xy('Play\\JumpCat.png',"跳跳貓",regionS=Region),(67, 46, 0)]
-            }
-
-            SuperCat={
-                'RamenCat':[get_xy('Play\\RamenCat.png',"拉麵貓",regionS=Region),(83, 61, 11)],
-                'BigBird':[get_xy('Play\\BigBird.png',"大狂鳥",regionS=Region),(142, 113, 44)],
-                'FlyingCat':[get_xy('Play\\FlyingCat.png',"飛腳貓",regionS=Region),(102, 68, 2)],
-                'Mutt38':[get_xy('Play\\Mutt38.png',"姆特",regionS=Region),(229, 198, 127)]
-            }
-
             for i in Cannon_Fodder:
                 Cannon=Cannon_Fodder[i]
                 if Cannon[0]:
@@ -439,34 +427,50 @@ while True:
                     MatchColor=pyautogui.pixelMatchesColor(CatX,CatY,Cannon[1])
                     print(f"{i} 可出擊:{MatchColor}")
                     if MatchColor:
-                        click(Cannon[0],Delay=0.2)
+                        click(Cannon[0])
             
-            for i in Wall:
-                Wall_W=Wall[i]
-                if Wall_W[0]:
-                    CatX,CatY=int(Wall_W[0].x),int(Wall_W[0].y)
+            if AutoC>=1:
+                Wall={
+                    'Wall':[get_xy('Play\\Wall.png',"基本牆",regionS=Region),(255, 255, 255),150],
+                    'BigWall':[get_xy('Play\\BigWall.png',"大狂牆",regionS=Region),(255, 255, 255)],
+                    'JumpCat':[get_xy('Play\\JumpCat.png',"跳跳貓",regionS=Region),(67, 46, 0)]
+                }
+                for i in Wall:
+                    Wall_W=Wall[i]
+                    if Wall_W[0]:
+                        CatX,CatY=int(Wall_W[0].x),int(Wall_W[0].y)
 
-                    print(f"{i}:{pyautogui.pixel(CatX,CatY)}") #確認顏色
+                        print(f"{i}:{pyautogui.pixel(CatX,CatY)}") #確認顏色
 
-                    MatchColor=pyautogui.pixelMatchesColor(CatX,CatY,Wall_W[1])
-                    print(f"{i} 可出擊:{MatchColor}")
-                    if MatchColor:
-                        click(Wall_W[0],Delay=0.2)
+                        MatchColor=pyautogui.pixelMatchesColor(CatX,CatY,Wall_W[1])
+                        print(f"{i} 可出擊:{MatchColor}")
+                        if MatchColor:
+                            click(Wall_W[0])            
             
-            for i in SuperCat:
-                SuCat=SuperCat[i]
+            if AutoC>=10:
+                SuperCat={
+                    'RamenCat':[get_xy('Play\\RamenCat.png',"拉麵貓",regionS=Region),(83, 61, 11)],
+                    'BigBird':[get_xy('Play\\BigBird.png',"大狂鳥",regionS=Region),(153, 124, 54)],
+                    'FlyingCat':[get_xy('Play\\FlyingCat.png',"飛腳貓",regionS=Region),(79, 52, 2)],
+                    'Mutt38':[get_xy('Play\\Mutt38.png',"姆特",regionS=Region),(229, 198, 127)]
+                }
+                for i in SuperCat:
+                    SuCat=SuperCat[i]
 
-                if SuCat[0]:
-                    CatX,CatY=int(SuCat[0].x),int(SuCat[0].y)
-                    
-                    print(f"{i}:{pyautogui.pixel(CatX,CatY)}") #確認顏色
-                    
-                    if SuCat[1]==None:continue #沒有指定顏色先跳過
-                    MatchColor=pyautogui.pixelMatchesColor(CatX,CatY,SuCat[1])
-                    print(f"{i} 可出擊:{MatchColor}")
-                    if MatchColor:
-                        click(SuCat[0],Delay=0.2)
-
+                    if SuCat[0]:
+                        CatX,CatY=int(SuCat[0].x),int(SuCat[0].y)
+                        
+                        print(f"{i}:{pyautogui.pixel(CatX,CatY)}") #確認顏色
+                        
+                        if SuCat[1]==None:continue #沒有指定顏色先跳過
+                        MatchColor=pyautogui.pixelMatchesColor(CatX,CatY,SuCat[1])
+                        print(f"{i} 可出擊:{MatchColor}")
+                        if MatchColor:
+                            click(SuCat[0])
+                time.sleep(2)
+                AutoC=0
+            print(f'AutoC:{AutoC}')
+            AutoC+=Delay #動態出貓間隔
 
 
     if AutoMode[0]==1:
