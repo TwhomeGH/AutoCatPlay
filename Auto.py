@@ -361,12 +361,44 @@ def press(key):
             WH=win32gui.GetWindowRect(FWinD[2])
             print(WH)
 
+MoveE=[]
+Distances=[]
+
+import math
+def get_distance(point1, point2):
+    """get_distance 計算兩點偏差值
+
+    Arguments:
+        point1 -- Dict{'x':30,'y':30}
+        point2 -- Dict{'x':30,'y':30}
+
+    Returns:
+        偏差值
+    """
+    x1, y1 = point1['x'], point1['y']
+    x2, y2 = point2['x'], point2['y']
+    return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
 def move(x,y):
-    global AutoMode
-    if AutoMode[0]==1:
-        AutoMode[0]=0
-    elif AutoMode[1]<5:
-        AutoMode[1]=5
+    global AutoMode,MoveE,Distances,Debug
+    if len(MoveE)<2:
+        MoveE.append({'x':x,'y':y})
+    if len(MoveE)==2:
+        distance = round(get_distance(MoveE[0], MoveE[1]))
+        Distances.append(distance)
+        
+        if len(Distances)==30:
+            DisSum=sum(Distances)
+            if Debug==1:print(f'10次偏差和:{DisSum}')
+            
+            if DisSum>300:
+                if AutoMode[0]==1:
+                    AutoMode[0]=0
+                elif AutoMode[1]<5:
+                    AutoMode[1]=5
+            
+            Distances.clear()
+        MoveE.clear()
 
 #鍵盤按鍵接收
 listen=keyboard.Listener(on_press=press)
