@@ -33,7 +33,7 @@ cv2Scale方法 如果可以找到已經調整過的樣本
 <kbd>C</kbd> 可以開關 戰鬥AI  
 <kbd>V</kbd> 可以取得鼠標位置(用來確認Region範圍用的)  
     <kbd>-</kbd> <kbd>+</kbd>  快捷降低/增加延遲間隔
-    <kbd>Num3</kbd> 快捷降低接替間隔
+    <kbd>Num3</kbd> 快捷降低接替間隔  
     <kbd>M</kbd> 用來取得指定窗口區域
 
 * Capture.py  
