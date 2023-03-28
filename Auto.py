@@ -439,7 +439,7 @@ while True:
         Shot=get_xy("Play\\Shot3.png","貓咪炮")
         
         if Shot:
-            Region=((HasRun.x-HasRun.x*0.6),Shot.y-round(Shot.y*0.23),(Shot.x+round(Shot.x*0.005)),round(Shot.y*0.35))
+            Region=((HasRun.x-round(HasRun.x*0.6)),Shot.y-round(Shot.y*0.23),(Shot.x+round(Shot.x*0.005)),round(Shot.y*0.35))
             
             # #測試擷取位置
             # print(Region,Shot)
@@ -451,7 +451,7 @@ while True:
             #     cv2.waitKey(0)
             #     cv2.destroyAllWindows()
 
-
+        #print(Region)
         if Region!=None:
             # Squirrel=get_xy('Play\\AT\\BSquirrel.png',"黑松鼠")
             BlackCat=get_xy('Play\\AT\\BlackCat.png',"黑熊")
