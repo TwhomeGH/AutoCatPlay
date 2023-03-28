@@ -5,7 +5,8 @@ import time #等待用
 import os #用來取當前文件位置
 import win32gui #窗口范範圍捕抓
 import cv2 #百分比調整
-import random
+import random #隨機數
+import threading
 from CatFeed import GetItem
 
 #項目位置
@@ -56,6 +57,10 @@ MSearchAddState=[
 
 os.system("title Auto加碼多多")
 
+
+def Thread(func):
+    T1=threading.Thread(target=func)
+    T1.start()
 
 
 def CheckActiveWindow():
@@ -334,13 +339,9 @@ def press(key):
             print(FRWW)
             REG=((FRWW.x-FRWW.x*0.1),(FRWW.y-FRWW.y*0.1),(FRWW.x+FRWW.x*0.1),(FRWW.y+FRWW.y*0.1))
             pyautogui.screenshot(region=REG).save(f'{ProjectPath}\\Test\\ResizeR.png')
-            cv2.imshow("FindResult",f"{ProjectPath}\\Test\\ResizeR.png")
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
-
-        cv2.imshow("Resize",ReSize.get('img'))
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+            ShowImage(f"{ProjectPath}\\Test\\ResizeR.png","FindResult")
+            
+        ShowImage(ReSize.get('img'),"Resize")
 
     elif key == KeySet.get("-Delay"):
         print(f"降低延遲間隔:{Delay}")
@@ -403,6 +404,24 @@ def move(x,y):
             Distances.clear()
         MoveE.clear()
 
+def ShowImage(img=None,title="TestShowImg",Delay=5000):
+    """ShowImage 顯示圖片
+
+    Keyword Arguments:
+        img -- 指定圖片位置 (default: {None})
+        title -- 顯示窗口名稱 (default: "TestShowImg") 
+        Delay -- 設定圖片展示幾秒後關閉 (default: {5000})
+    """
+    if img is None:
+        print("沒有圖片輸入!")
+        return
+
+    
+    Thread(cv2.imshow(title,img))
+    cv2.waitKey(Delay)
+    cv2.destroyAllWindows()
+
+
 #鍵盤按鍵接收
 listen=keyboard.Listener(on_press=press)
 listen.start()
@@ -441,17 +460,14 @@ while True:
         if Shot:
             Region=((HasRun.x-round(HasRun.x*0.6)),Shot.y-round(Shot.y*0.23),(Shot.x+round(Shot.x*0.005)),round(Shot.y*0.35))
             
-            # #測試擷取位置
-            # print(Region,Shot)
-            # SE=pyautogui.screenshot(region=Region)
-            # SE.save(f'{ProjectPath}\\Test\\RCat.png')
-            # if Debug==2:
-            #     TESTR=cv2.imread(f'{ProjectPath}\\Test\RCat.png')
-            #     cv2.imshow("TestR",TESTR)
-            #     cv2.waitKey(0)
-            #     cv2.destroyAllWindows()
+            #測試擷取位置
+            if Debug==2:
+                print(Region,Shot)
+                SE=pyautogui.screenshot(region=Region)
+                SE.save(f'{ProjectPath}\\Test\\RCat.png')
+                ShowImage(f'{ProjectPath}\\Test\RCat.png','測試範圍')
 
-        #print(Region)
+
         if Region!=None:
             # Squirrel=get_xy('Play\\AT\\BSquirrel.png',"黑松鼠")
             BlackCat=get_xy('Play\\AT\\BlackCat.png',"黑熊")
