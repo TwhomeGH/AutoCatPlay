@@ -29,7 +29,7 @@ KeySet={
     'WinRect':keyboard.KeyCode.from_char('m')
     }
 
-AutoMode=[0,3,0,30,4] #用於確定是否需要自動接替
+AutoMode=[0,15,0,30,4] #用於確定是否需要自動接替
 # [0]自動加碼多多狀態
 # [1]接替倒數
 # [2]戰鬥AI狀態
@@ -394,8 +394,8 @@ def move(x,y):
             if DisSum>300:
                 if AutoMode[0]==1:
                     AutoMode[0]=0
-                elif AutoMode[1]<5:
-                    AutoMode[1]=5
+                elif AutoMode[1]<15:
+                    AutoMode[1]=15
             
             Distances.clear()
         MoveE.clear()
@@ -428,8 +428,9 @@ while True:
     if AutoMode[1]>0:AutoMode[1]-=1
     
     
+    pyautogui.screenshot() #提前取得截圖 
+    #避面頻繁調用get_xy時 頻繁獲得新截圖
     
-
     HasRun=get_xy('HasRun.png',"正在遊戲中")    
     if HasRun and AutoMode[2]==1:
         Shot=get_xy("Play\\Shot3.png","貓咪炮")
