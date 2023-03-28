@@ -15,7 +15,10 @@ print('Project >>',ProjectPath)
 WebFile="C:/Users/u01/Desktop/NuclearWeb/Status.txt" #用於指定任意位置存放統計結果
 SearchWin="雷電模擬器" #查找你需要的窗口
 
-Debug=0 #1啟用測試模式(只監聽滑鼠鍵盤)
+Debug=0
+#1 啟用測試模式(只監聽滑鼠鍵盤)
+#2 測試戰鬥AI Region位置
+
 Delay=3 #檢測延遲
 
 KeySet={
@@ -330,8 +333,8 @@ def press(key):
             #計算擷取範圍
             print(FRWW)
             REG=((FRWW.x-FRWW.x*0.1),(FRWW.y-FRWW.y*0.1),(FRWW.x+FRWW.x*0.1),(FRWW.y+FRWW.y*0.1))
-            pyautogui.screenshot(region=REG).save(f'{ProjectPath}\\ResizeR.png')
-            cv2.imshow("FindResult",f"{ProjectPath}\\ResizeR.png")
+            pyautogui.screenshot(region=REG).save(f'{ProjectPath}\\Test\\ResizeR.png')
+            cv2.imshow("FindResult",f"{ProjectPath}\\Test\\ResizeR.png")
             cv2.waitKey(0)
             cv2.destroyAllWindows()
 
@@ -436,8 +439,17 @@ while True:
         Shot=get_xy("Play\\Shot3.png","貓咪炮")
         
         if Shot:
-            Region=(HasRun.x,Shot.y-round(Shot.y*0.3),Shot.x,Shot.y)
-            print(Region)
+            Region=((HasRun.x-HasRun.x),Shot.y-round(Shot.y*0.3),(Shot.x+round(Shot.x*0.1)),round(Shot.y*0.41))
+            print(Region,Shot)
+            SE=pyautogui.screenshot(region=Region)
+            SE.save(f'{ProjectPath}\\TestR300.png')
+            #測試擷取位置
+            if Debug==2:
+                TESTR=cv2.imread(f'{ProjectPath}\\Test\RCat.png')
+                cv2.imshow("TestR",TESTR)
+                cv2.waitKey(0)
+                cv2.destroyAllWindows()
+
         if Region!=None:
             # Squirrel=get_xy('Play\\AT\\BSquirrel.png',"黑松鼠")
             BlackCat=get_xy('Play\\AT\\BlackCat.png',"黑熊")
