@@ -439,16 +439,18 @@ while True:
         Shot=get_xy("Play\\Shot3.png","貓咪炮")
         
         if Shot:
-            Region=((HasRun.x-HasRun.x),Shot.y-round(Shot.y*0.3),(Shot.x+round(Shot.x*0.1)),round(Shot.y*0.41))
-            print(Region,Shot)
-            SE=pyautogui.screenshot(region=Region)
-            SE.save(f'{ProjectPath}\\TestR300.png')
-            #測試擷取位置
-            if Debug==2:
-                TESTR=cv2.imread(f'{ProjectPath}\\Test\RCat.png')
-                cv2.imshow("TestR",TESTR)
-                cv2.waitKey(0)
-                cv2.destroyAllWindows()
+            Region=((HasRun.x-HasRun.x*0.6),Shot.y-round(Shot.y*0.23),(Shot.x+round(Shot.x*0.005)),round(Shot.y*0.35))
+            
+            # #測試擷取位置
+            # print(Region,Shot)
+            # SE=pyautogui.screenshot(region=Region)
+            # SE.save(f'{ProjectPath}\\Test\\RCat.png')
+            # if Debug==2:
+            #     TESTR=cv2.imread(f'{ProjectPath}\\Test\RCat.png')
+            #     cv2.imshow("TestR",TESTR)
+            #     cv2.waitKey(0)
+            #     cv2.destroyAllWindows()
+
 
         if Region!=None:
             # Squirrel=get_xy('Play\\AT\\BSquirrel.png',"黑松鼠")
