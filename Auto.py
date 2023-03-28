@@ -450,9 +450,6 @@ while True:
     if AutoMode[1]>0:AutoMode[1]-=1
     
     
-    pyautogui.screenshot() #提前取得截圖 
-    #避面頻繁調用get_xy時 頻繁獲得新截圖
-    
     HasRun=get_xy('HasRun.png',"正在遊戲中")    
     if HasRun and AutoMode[2]==1:
         Shot=get_xy("Play\\Shot3.png","貓咪炮")
@@ -643,7 +640,7 @@ while True:
                 AutoState=MoreSearch(listT=MSearchAddState,Name="加碼多多 尚未探險",Mode_=1)
                 if AutoState:
                     click(AutoState)
-                    time.sleep(1)
+                    time.sleep(3)
                     
                     SetHour=1
                     if ItemGet.Play>0:
@@ -657,7 +654,7 @@ while True:
                     ItemGet.Hour+=SetHour
                     AutoA1=get_xy(f"Select\\{SetHour}HS.png",f"加碼多多{SetHour}H",Mode=1) 
                     if AutoA1:
-                        time.sleep(1)
+                        time.sleep(3)
                         click(AutoA1)
                         time.sleep(3)
                         OK=get_xy("Select\\Yes.png","確定",Mode=1)
