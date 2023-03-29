@@ -80,6 +80,7 @@ python Auto.py
 
 
 * Get 用於在得到物品 存下圖片
+> Screen.txt 是關於截圖時 窗口區域信息
 > 這是我打算自動蒐集得到物品樣本用的
 
 * Shot 這是使用Capture截取下來的圖片存儲位置
@@ -117,13 +118,12 @@ python Auto.py
 ```
 WebFile="C:/Users/u01/Desktop/NuclearWeb/Status.txt"
 ```
-如果沒有打算在自架網站根目錄下寫入一個文字文件  
-來方便你從Siri捷徑 來取得內容的話  
-可以直接修改成  
-```
-WebFile=None
-```
-這會自動略過  
+
+| WebFile 值 | 說明 |
+| --- | --- |
+| None | 略過寫入指定檔案 |
+| String | 要寫入的檔案路徑 |
+
 用來給Siri捷徑 訪問網站下的指定檔案 獲取文字內容   
 來方便從iPad上查看統計數據
 
@@ -133,25 +133,44 @@ KeySet={
     'Exit':keyboard.Key.esc,
     'Auto':keyboard.KeyCode.from_char('g'),
     'Point':keyboard.KeyCode.from_char('h')
+    ...
 }
 ```
+
+| KeySet 字典值 | 快捷鍵說明 |
+| --- | --- |
+| Exit | 退出程序用的 |
+| Auto | 戰鬥AI 開關 |
+| Point | 獲取鼠標位置 |
+| TestRisze | 測試重新縮放圖片 |
+| -Delay | 減少運行間隔 |
+| +Delay | 增加運行間隔 |
+| AutoDelay | 降低接替間隔 |
+| WinRect | 取得SearchWin的窗口區域 |
 
 現在你可以設定這個3個按鍵
 你想要使用的按鍵了
 
-## 關於SearchWin - Auto.py
+## 關於一些變數 - Auto.py
 
 ```
 SearchWin="雷電模擬器"
-```
-用來指定特定窗口(窗口標題) 以便於計算縮放百分比用
-
-## 關於Debug - Auto.py
-
-```
 Debug=0
 ```
 
-本變數很簡單 設置成1則開啟簡易調試模式
 
-這是調試期間 只打算進行鍵盤/滑鼠部分的調試用
+| SearchWin 值| 說明 | 用途 |
+| --- | --- | --- |
+| String | 窗口標題 | 以便於計算縮放百分比用 |
+
+
+| Debug 值 | 說明 |
+| --- | --- |
+| 0 | 沒有调試輸出 |
+| 1 | 簡易調適模式<br>這是調試期間 只打算進行鍵盤/滑鼠部分的調試用 |
+| 2 | 測試戰鬥AI Region位置<br>以及click功能Debug |
+
+
+### click功能Debug
+使用Mode=1時
+會自動點擊後降低接替間格
