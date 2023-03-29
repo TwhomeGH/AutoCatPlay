@@ -7,7 +7,7 @@ import win32gui #窗口范範圍捕抓
 import cv2 #百分比調整
 import random #隨機數
 import threading
-from CatFeed import GetItem
+from CatFeed import *
 
 #項目位置
 ProjectPath=os.path.dirname(os.path.abspath(__file__))
@@ -18,7 +18,7 @@ SearchWin="雷電模擬器" #查找你需要的窗口
 
 Debug=0
 #1 啟用測試模式(只監聽滑鼠鍵盤)
-#2 測試戰鬥AI Region位置
+#2 測試戰鬥AI Region位置 以及click功能Debug
 
 Delay=3 #檢測延遲
 
@@ -58,61 +58,34 @@ MSearchAddState=[
 os.system("title Auto加碼多多")
 
 
-def Thread(func):
-    T1=threading.Thread(target=func)
-    T1.start()
+def FWScale(Find_W='雷電模擬器',width=1920,height=1080,tip=0):
+    """FWScale 用於計算縮放百分比
 
+    Keyword Arguments:
+        Find_W -- 查找指定窗口 (default: {'雷電模擬器'})
+        width -- 原始圖片分辨率 (default: {1920})
+        height -- 原始圖片分辨率 (default: {1080})
 
-def CheckActiveWindow():
+        原始圖片分辨率是 指在原始窗口最大寬高下進行擷取的分辨率
+
+        tip -- 1 啟用偵錯信息 (default: {0})
+
+    Returns:
+        [0.3,0.1] 寬百分比 & 高百分比
     """
-    此方法獲取正在使用窗口信息\n
-    返回 窗口標題 Text 標題長度 Len\n
-        纇名 Class 窗口大小 Rect(x1,y1,x2,y2) 
-    """
-    ActWindow=win32gui.GetForegroundWindow() #取當前正在使用的窗口
+    FWinD=WinTool.FindW(Window=Find_W)
+    if FWinD:
+        WH=win32gui.GetWindowRect(FWinD[2]) #取得窗口範圍
+        widthW=WH[2]-WH[0]
+        heightH=WH[3]-WH[1]
+
+        if tip==1:print(WH,widthW,heightH)
+        ScaleW=round(widthW/width,2)
+        ScaleH=round(heightH/height,2)
+        if tip==1:print(ScaleW,ScaleH)
+
+        return [ScaleW,ScaleH]
     
-    WindowLen=win32gui.GetWindowTextLength(ActWindow)
-    if win32gui.GetWindowText(ActWindow) == "":
-        WindowT="沒有窗口標題"
-    else:
-        WindowT=win32gui.GetWindowText(ActWindow)
-    
-    Result={
-            "Text":WindowT,
-            "Len":WindowLen,
-            "Class":win32gui.GetClassName(ActWindow),
-            "Rect":win32gui.GetWindowRect(ActWindow)
-    }
-    return Result
-
-def WCall(hand,extra):
-    """
-    handle 句柄
-    extra 格式設定
-    """
-    wind=extra
-    temp=[]
-    temp.append(win32gui.GetWindowText(hand))
-    wind[hand]=temp
-    print(f"{hand}:{extra}")
-
-def FindW(Class=None,Window=None):
-    """
-    用於指定窗口定位\n
-    Window 查找特定窗口名稱
-    Class 纇名
-    """
-    handle=win32gui.FindWindow(Class,Window)
-    if handle == 0:
-        return None
-    else:
-        temp=[
-            win32gui.GetClassName(handle),
-            win32gui.GetWindowText(handle),
-            handle,
-        ]
-        return temp
-
 def cv2Scale(image,scale_percent=[0.8,0.3],Debug=False,ReadF=False):
     """cv2Scale 用於重新縮放圖片
 
@@ -203,13 +176,13 @@ def cv2Scale(image,scale_percent=[0.8,0.3],Debug=False,ReadF=False):
     if ReadF:Result["img"]=resizeR
     return Result
 
-
-def click(xy,x1r=0,num=1,Delay=0):
+def click(xy,x1r=0,num=1,Delay=0,Mode=0):
     """
     xy 位置
     x1r x偏易增減
     num 次數
     Delay 間隔
+    Mode 1 啟用點擊時 更新接替間隔()
     """
     for i in range(num):
         pydirectinput.mouseDown(xy[0]+x1r,xy[1])
@@ -221,33 +194,11 @@ def click(xy,x1r=0,num=1,Delay=0):
         
         time.sleep(Delay)
 
-def FWScale(Find_W='雷電模擬器',width=1920,height=1080,tip=0):
-    """FWScale 用於計算縮放百分比
-
-    Keyword Arguments:
-        Find_W -- 查找指定窗口 (default: {'雷電模擬器'})
-        width -- 原始圖片分辨率 (default: {1920})
-        height -- 原始圖片分辨率 (default: {1080})
-
-        原始圖片分辨率是 指在原始窗口最大寬高下進行擷取的分辨率
-
-        tip -- 1 啟用偵錯信息 (default: {0})
-
-    Returns:
-        [0.3,0.1] 寬百分比 & 高百分比
-    """
-    FWinD=FindW(Window=Find_W)
-    if FWinD:
-        WH=win32gui.GetWindowRect(FWinD[2]) #取得窗口範圍
-        widthW=WH[2]-WH[0]
-        heightH=WH[3]-WH[1]
-
-        if tip==1:print(WH,widthW,heightH)
-        ScaleW=round(widthW/width,2)
-        ScaleH=round(heightH/height,2)
-        if tip==1:print(ScaleW,ScaleH)
-
-        return [ScaleW,ScaleH]
+    if Mode==1:
+        global AutoMode,Debug
+        if AutoMode[1]>3:AutoMode[1]=3
+        if Debug==2:print(f"自動點擊間隔更新! {AutoMode[1]}")
+        #避面自動點擊 誤判使用者活動
 
 def get_xy(img_path=None,name="測試",tip=None,confi=0.9,regionS=None,Mode=0):
     """
@@ -281,7 +232,25 @@ def get_xy(img_path=None,name="測試",tip=None,confi=0.9,regionS=None,Mode=0):
     elif tip==1:
         print(f"{name} 沒有")
 
+def ShowImage(img=None,title="TestShowImg",Delay=5000):
+    """ShowImage 顯示圖片
 
+    Keyword Arguments:
+        img -- 指定圖片位置 (default: {None})
+        title -- 顯示窗口名稱 (default: "TestShowImg") 
+        Delay -- 設定圖片展示幾秒後關閉 (default: {5000})
+    """
+    if img is None:
+        print("沒有圖片輸入!")
+        return
+        
+    WinTool.Thread(
+        lambda:( #用於快捷定義func運行多個命令
+            cv2.imshow(title,img),
+            cv2.waitKey(Delay),
+            cv2.destroyAllWindows()
+        )
+    )
 
 def MoreSearch(dir="Add",listT=list(["1.png","2.png"]),Name="Test",Mode_=0,Delay=0.5):
     """
@@ -302,6 +271,10 @@ def MoreSearch(dir="Add",listT=list(["1.png","2.png"]),Name="Test",Mode_=0,Delay
             return None
         
 
+MoveE=[]
+Distances=[]
+
+#鍵盤
 def press(key):
     """
     key 接收按下的按鍵
@@ -360,35 +333,17 @@ def press(key):
             print(f"降低接替間隔:{AutoMode[1]}")
         
     elif key == KeySet.get("WinRect"):
-        FWinD=FindW(Window=SearchWin)
+        FWinD=WinTool.FindW(Window=SearchWin)
         if FWinD:
             WH=win32gui.GetWindowRect(FWinD[2])
             print(WH)
-
-MoveE=[]
-Distances=[]
-
-import math
-def get_distance(point1, point2):
-    """get_distance 計算兩點偏差值
-
-    Arguments:
-        point1 -- Dict{'x':30,'y':30}
-        point2 -- Dict{'x':30,'y':30}
-
-    Returns:
-        偏差值
-    """
-    x1, y1 = point1['x'], point1['y']
-    x2, y2 = point2['x'], point2['y']
-    return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-
+#滑鼠
 def move(x,y):
     global AutoMode,MoveE,Distances,Debug
     if len(MoveE)<2:
         MoveE.append({'x':x,'y':y})
     if len(MoveE)==2:
-        distance = round(get_distance(MoveE[0], MoveE[1]))
+        distance = round(WinTool.get_distance(MoveE[0], MoveE[1]))
         Distances.append(distance)
         
         if len(Distances)==30:
@@ -404,23 +359,6 @@ def move(x,y):
             Distances.clear()
         MoveE.clear()
 
-def ShowImage(img=None,title="TestShowImg",Delay=5000):
-    """ShowImage 顯示圖片
-
-    Keyword Arguments:
-        img -- 指定圖片位置 (default: {None})
-        title -- 顯示窗口名稱 (default: "TestShowImg") 
-        Delay -- 設定圖片展示幾秒後關閉 (default: {5000})
-    """
-    if img is None:
-        print("沒有圖片輸入!")
-        return
-
-    
-    Thread(cv2.imshow(title,img))
-    cv2.waitKey(Delay)
-    cv2.destroyAllWindows()
-
 
 #鍵盤按鍵接收
 listen=keyboard.Listener(on_press=press)
@@ -433,8 +371,10 @@ listen2.start()
 while True:
     if ESCCount>0:ESCCount-=1
     Position=pyautogui.position()
-    print(f"當前位置:{Position} 延遲:{Delay} 狀態:{AutoMode[0]}")
-    print(f"自動下一步:{AutoMode[3]} 接替於:{AutoMode[1]} ESC:{ESCCount}")
+    print(f"""
+    當前位置:{Position} 延遲:{Delay} 狀態:{AutoMode[0]}
+    自動下一步:{AutoMode[3]} 接替於:{AutoMode[1]} ESC:{ESCCount}
+    """)
     #LDOperationRecorderWindow 操作錄製窗口
     #LDPlayerMainFrame 主窗口    
     
@@ -655,12 +595,12 @@ while True:
                     AutoA1=get_xy(f"Select\\{SetHour}HS.png",f"加碼多多{SetHour}H",Mode=1) 
                     if AutoA1:
                         time.sleep(3)
-                        click(AutoA1)
+                        click(AutoA1,Mode=1)
                         time.sleep(3)
                         OK=get_xy("Select\\Yes.png","確定",Mode=1)
                         if OK:
                             Delay=10
-                            click(OK)
+                            click(OK,Mode=1)
                             ItemGet.Play+=1
 
                         time.sleep(3) #等待3秒
@@ -669,27 +609,40 @@ while True:
 
                 Gold=get_xy("Gold2.png","驗收",Mode=1)
                 if Gold:
-                    click(Gold)
+                    click(Gold,Mode=1)
                 
                 Next=get_xy("GetMore.png","下一步",Mode=1)
                 if Next:
                     if Delay>=3:Delay=1
-                    click(Next)
+                    click(Next,Mode=1)
                 GetM=get_xy("Get3.png","得到物品",Mode=1)    
                 if GetM:
                     RG=(GetM.x-700,GetM.y-400,GetM.x+500,GetM.y+100)
+                    
+                    CheckFile=None #檢測是否相似用
                     FileRoot=f"{ProjectPath}\\Get\{CaptureF}.png"
-                    while os.path.exists(FileRoot):
+                    
+                    while os.path.exists(FileRoot): #已存在檔案檢測
                         print(f'{FileRoot}:存在')
+                        
+                        CheckFile=get_xy(FileRoot,'檢測是否此檔案相似')
                         CaptureF+=1
                         FileRoot=f"{ProjectPath}\\Get\{CaptureF}.png"
                     
-                    pyautogui.screenshot(region=RG).save(FileRoot)
-                    SWW=FindW(SearchWin)
+                    if CheckFile is None:
+                        pyautogui.screenshot(region=RG).save(FileRoot)
+                    else:
+                        print("截圖相符! 已略過新存儲")
+
+                    SWW=WinTool.FindW(Window=SearchWin)
                     if SWW:
+                        print("已找到窗口")
                         WinRect=win32gui.GetWindowRect(SWW[2])
                         with open(f"{ProjectPath}\\Get\\Screen.txt", "a") as f:
-                            f.write(f"窗口區域:{CaptureF}:{WinRect}\n")
+                            f.write(f"{time.gmtime}窗口區域:{CaptureF}:{WinRect}\n")
+                    else:
+                        print(f"沒找到窗口{SWW}")
+                        
 
                     Feed=get_xy('item/Feed.png',"獲得罐頭",Mode=1)
                     if Feed:
@@ -697,7 +650,7 @@ while True:
                         if Feed1:ItemGet.AddFeed(2)
                         else:   
                             ItemGet.AddFeed(1)
-                        click(GetM)
+                        click(GetM,Mode=1)
                     
                     xp=get_xy('item/xp.png',"獲得xp",Mode=1)
                     if xp:
@@ -706,17 +659,17 @@ while True:
                             ItemGet.AddXP(800)
                         else:
                             ItemGet.AddXP(100)
-                        click(GetM)
+                        click(GetM,Mode=1)
 
                     xp5k=get_xy('item/xp/5000.png',"獲得xp 5000",Mode=1)    
                     if xp5k:
                         ItemGet.AddXP(800)
-                        click(GetM)
+                        click(GetM,Mode=1)
 
                     xp1w=get_xy('item/xp/10000.png',"獲得xp 10000",Mode=1)    
                     if xp1w:
                         ItemGet.AddXP(10000)
-                        click(GetM)
+                        click(GetM,Mode=1)
                     xp3w=get_xy('item/xp/30000.png',"獲得xp 30000",Mode=1)    
                     if xp3w:
                         ItemGet.AddXP(3000)    
@@ -725,10 +678,10 @@ while True:
 
                 Back=get_xy("Back.png","回來了",Mode=1)
                 if Back:
-                    click(Back,2)
+                    click(Back,Mode=1)
                 End=get_xy("End.png","探險結果",Mode=1)
                 if End:
-                    click(End,2)
+                    click(End,Mode=1)
 
                 if HourCount>=6:
                     HourCount=0
