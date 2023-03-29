@@ -17,8 +17,9 @@ print('Project >>',ProjectPath)
 print("5秒後開始")
 time.sleep(5)
 E=pyautogui.screenshot()
-E.save(f"{ProjectPath}\\TR.png")
-print(E)
+File_Root=os.path.join(ProjectPath,"Test","TR.png")
+E.save(File_Root)
+print(File_Root)
 
 # 以下部分是使用到easyocr的部分
 
