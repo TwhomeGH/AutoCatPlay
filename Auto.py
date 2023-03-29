@@ -607,11 +607,11 @@ while True:
 
                         
 
-                Gold=get_xy("Gold2.png","驗收",Mode=1)
+                Gold=get_xy("Gold.png","驗收",Mode=1)
                 if Gold:
                     click(Gold,Mode=1)
                 
-                Next=get_xy("GetMore.png","下一步",Mode=1)
+                Next=get_xy("Select\\Next.png","下一步",Mode=1)
                 if Next:
                     if Delay>=3:Delay=1
                     click(Next,Mode=1)
