@@ -1,6 +1,134 @@
 """
 用於統計得到物品用
 """
+import time,math
+import threading
+import win32gui
+
+class WinTool:
+    """
+    一些工具函式
+    """
+    def get_distance(point1, point2):
+        """get_distance 計算兩點偏差值
+
+        Arguments:
+            point1 -- Dict{'x':30,'y':30}
+            point2 -- Dict{'x':30,'y':30}
+
+        Returns:
+            偏差值
+        """
+        x1, y1 = point1['x'], point1['y']
+        x2, y2 = point2['x'], point2['y']
+        return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
+    def Thread(func,argsR=None):
+        """Thread 啟用新線程
+
+        會單獨開啟一個新線程運行func的內容
+
+        Arguments:
+            func -- 指定觸發函式
+            argsR -- 傳遞給指定函式的參數
+        """
+        if argsR:
+            T1=threading.Thread(target=func,args=argsR)
+        else:T1 = threading.Thread(target=func)
+        T1.start()
+
+    def FindW(Class=None,Window=None):
+        """
+        用於指定窗口定位
+
+        Window 查找特定窗口名稱
+        Class 纇名
+        """
+        handle=win32gui.FindWindow(Class,Window)
+        if handle == 0:
+            return None
+        else:
+            temp=[
+                win32gui.GetClassName(handle),
+                win32gui.GetWindowText(handle),
+                handle,
+            ]
+            return temp
+    
+    def WCall(handle,extra):
+        """
+        WCall - 獲取窗口標題並打印
+        
+        handle 句柄
+        extra 格式設定
+        """
+        wind=extra
+        temp=[]
+        temp.append(win32gui.GetWindowText(handle))
+        wind[handle]=temp
+        print(f"{handle}:{extra}")
+
+
+    def CheckActiveWindow():
+        """
+        此方法獲取正在使用窗口信息
+
+        return 字典 Dict 
+            窗口標題 Text 標題長度 Len
+
+            纇名 Class 窗口大小 Rect(x1,y1,x2,y2)
+        """
+        ActWindow=win32gui.GetForegroundWindow() #取當前正在使用的窗口
+        
+        WindowLen=win32gui.GetWindowTextLength(ActWindow)
+        if win32gui.GetWindowText(ActWindow) == "":
+            WindowT="沒有窗口標題"
+        else:
+            WindowT=win32gui.GetWindowText(ActWindow)
+        
+        Result={
+                "Text":WindowT,
+                "Len":WindowLen,
+                "Class":win32gui.GetClassName(ActWindow),
+                "Rect":win32gui.GetWindowRect(ActWindow)
+        }
+        return Result
+
+
+
+    def NowTime(Format=f"%Y/%m/%d %p %H:%M:%S",**Replace):
+        """
+        Format:f"%Y/%m/%d" 顯示樣式調整
+        
+        Replace:文字替換
+        使用方法:設定一個你要替換的參數
+
+        例:NowTime(AM="上午")
+            字串結果裡會找到替換AM成上午
+
+        例2:NowTime(_2023=2023年)
+            如果你要用數字只要前面先加上_即可
+
+            會取_後的文字
+
+        Return:String 本地時間
+        """
+        curTime=time.time()
+        format_time=time.localtime(curTime) #本地時間
+        
+        str=time.strftime(Format,format_time) #格式轉換
+        
+        for key in Replace:
+            if key.find("_") != -1:
+                keyS=key.split("_")[1]
+            else:
+                keyS=key
+
+            str = str.replace(keyS, Replace[key])
+        
+        return str
+    
+
 
 class GetItem: 
     """主要進行統計加減值"""
