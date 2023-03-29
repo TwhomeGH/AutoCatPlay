@@ -18,10 +18,10 @@
 此方法只有使用get_xy/MoreSearch  
 指定Mode=1/Mode_=1時會使用  
 
-此功能會由cv2Scale方法進行  
-需要指定窗口SearchWin  
+此功能會由`cv2Scale`方法進行  
+需要指定窗口`SearchWin`的窗口標題
 
-cv2Scale方法 如果可以找到已經調整過的樣本  
+`cv2Scale`方法 如果可以找到已經調整過的樣本  
 則會直接計算差異 確認是否需要再重新調整  
 否則直接返回已存在檔案位置
 
