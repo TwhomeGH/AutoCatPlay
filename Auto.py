@@ -639,7 +639,7 @@ while True:
                         print("已找到窗口")
                         WinRect=win32gui.GetWindowRect(SWW[2])
                         with open(f"{ProjectPath}\\Get\\Screen.txt", "a") as f:
-                            f.write(f"[{WinTool.NowTime}]\n窗口區域:{CaptureF}:{WinRect}\n")
+                            f.write(f"[{WinTool.NowTime()}]\n窗口區域:{CaptureF}:{WinRect}\n")
                     else:
                         print(f"沒找到窗口{SWW}")
                         
