@@ -24,9 +24,9 @@ class WinTool:
         return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
     def Thread(func,argsR=None):
-        """Thread 啟用新線程
+        """Thread 運行新線程
 
-        會單獨開啟一個新線程運行func的內容
+        會運行func的內容
 
         Arguments:
             func -- 指定觸發函式
@@ -35,6 +35,8 @@ class WinTool:
         if argsR:
             T1=threading.Thread(target=func,args=argsR)
         else:T1 = threading.Thread(target=func)
+        
+        #print(T1.getName(),T1.is_alive())
         T1.start()
 
     def FindW(Class=None,Window=None):
