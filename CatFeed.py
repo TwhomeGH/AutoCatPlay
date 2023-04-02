@@ -45,6 +45,13 @@ class WinTool:
 
         Window 查找特定窗口名稱
         Class 纇名
+
+        Return -- list
+            [0]:ClassName
+            [1]:WindowText
+            [2]:WindowRect
+            [3]:handle
+
         """
         handle=win32gui.FindWindow(Class,Window)
         if handle == 0:
@@ -53,9 +60,36 @@ class WinTool:
             temp=[
                 win32gui.GetClassName(handle),
                 win32gui.GetWindowText(handle),
+                win32gui.GetWindowRect(handle),
                 handle,
             ]
             return temp
+    
+    def FWScale(Find_W='雷電模擬器',width=1920,height=1080,tip=0):
+        """FWScale 用於計算縮放百分比
+
+        Keyword Arguments:
+            Find_W -- 查找指定窗口 (default: {'雷電模擬器'})
+            width -- 原始圖片分辨率 (default: {1920})
+            height -- 原始圖片分辨率 (default: {1080})
+
+            原始圖片分辨率是 指在原始窗口最大寬高下進行擷取的分辨率
+
+            tip -- 1 啟用偵錯信息 (default: {0})
+
+        Returns:
+            [0.3,0.1] 寬百分比 & 高百分比
+        """
+        FWinD=__class__.FindW(Window=Find_W)
+        if FWinD:
+            WH=FWinD[2] #取得窗口範圍
+            widthW,heightH=WH[2]-WH[0],WH[3]-WH[1]
+
+            if tip==1:print(WH,widthW,heightH)
+            ScaleW,ScaleH=round(widthW/width,2),round(heightH/height,2)
+            if tip==1:print(ScaleW,ScaleH)
+
+            return [ScaleW,ScaleH]
     
     def WCall(handle,extra):
         """
@@ -131,6 +165,31 @@ class WinTool:
         return str
     
 
+
+import cv2
+class cv2Tool:
+    """
+    此類整合了 關於使用cv2方法
+    """
+    def ShowImage(img=None,title="TestShowImg",Delay=5000):
+        """ShowImage 顯示圖片
+
+        Keyword Arguments:
+            img -- 指定圖片位置 (default: {None})
+            title -- 顯示窗口名稱 (default: "TestShowImg") 
+            Delay -- 設定圖片展示幾秒後關閉 (default: {5000})
+        """
+        if img is None:
+            print("沒有圖片輸入!")
+            return
+        
+        WinTool.Thread(
+            lambda:( #用於快捷定義func運行多個命令
+                cv2.imshow(title,img),
+            )
+        )
+        cv2.waitKey(5000)
+        cv2.destroyAllWindows()
 
 class GetItem: 
     """主要進行統計加減值"""
