@@ -35,6 +35,7 @@
     <kbd>-</kbd> <kbd>+</kbd>  快捷降低/增加延遲間隔
     <kbd>Num3</kbd> 快捷降低接替間隔  
     <kbd>M</kbd> 用來取得指定窗口區域
+    <kbd>L</kbd> 測試探險策略
 
 * Capture.py  
 <kbd>G</kbd> 設置取樣點-1    
@@ -147,6 +148,7 @@ KeySet={
 | +Delay | 增加運行間隔 |
 | AutoDelay | 降低接替間隔 |
 | WinRect | 取得SearchWin的窗口區域 |
+| HourList | 測試探險策略 |
 
 現在你可以設定這個3個按鍵
 你想要使用的按鍵了
@@ -169,6 +171,7 @@ Debug=0
 | 0 | 沒有调試輸出 |
 | 1 | 簡易調適模式<br>這是調試期間 只打算進行鍵盤/滑鼠部分的調試用 |
 | 2 | 測試戰鬥AI Region位置<br>以及click功能Debug |
+| 3 | 不測試滑鼠(這可以讓你在進行斷點調適不造成卡頓) |
 
 
 ### click功能Debug
