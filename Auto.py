@@ -571,11 +571,11 @@ while True:
                 time.sleep(3)
                 
                 MapsS=0 #第幾組Map
-                if ItemGet.Play>0:
+                if ItemGet.Play<40:
                     XPRange=ItemGet.Range().get('XP')
-                    if XPRange>40:
+                    if XPRange>=40:
                         MapsS=1
-                    elif XPRange>70:
+                    elif XPRange>=70:
                         MapsS=2
                 SetHour=HourGet(Maps=MapsS,Debug=1)[0]
                 
