@@ -47,9 +47,28 @@ matcher=cv2.BFMatcher()
 
 Rect=WinTool.FindW(Window='雷電模擬器')
 
+HourP=[1,2,3,3,3,6,3,3]
+
 while True:
     #截圖
     
+    RNum=1
+    String=f"R{RNum}"
+    AP=0
+    for i in HourP:
+
+        if AP<=3:
+            Add='+'
+            if AP>=3:
+                Add=f'R{RNum}\nR{RNum+1}'
+                RNum+=1
+                AP=0
+            String=f"{String}{i}"+ Add 
+
+        AP+=1
+
+    print(String)
+    continue
     if Rect is None:
         continue
     RectL=Rect[2] 
