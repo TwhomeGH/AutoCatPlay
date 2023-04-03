@@ -23,7 +23,7 @@ class WinTool:
         x2, y2 = point2['x'], point2['y']
         return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
-    def Thread(func,argsR=None):
+    def Thread(func,argsR=None,Mode=0):
         """Thread 運行新線程
 
         會運行func的內容
@@ -31,13 +31,18 @@ class WinTool:
         Arguments:
             func -- 指定觸發函式
             argsR -- 傳遞給指定函式的參數
+            Mode -- 1 加入線程列表
         """
         if argsR:
             T1=threading.Thread(target=func,args=argsR)
         else:T1 = threading.Thread(target=func)
         
         #print(T1.getName(),T1.is_alive())
-        T1.start()
+        if Mode==0:
+            T1.start()
+        else:
+            T1.start()
+            T1.join()
 
     def FindW(Class=None,Window=None):
         """
@@ -186,10 +191,81 @@ class cv2Tool:
         WinTool.Thread(
             lambda:( #用於快捷定義func運行多個命令
                 cv2.imshow(title,img),
-            )
+                cv2.waitKey(Delay),
+                cv2.destroyAllWindows()
+            ),Mode=1
         )
-        cv2.waitKey(5000)
-        cv2.destroyAllWindows()
+
+    def Search(img1,imgF,ORB=cv2.SIFT.create(1000),matcher=cv2.BFMatcher(),confi=0.7):
+        """Search 使用SIFT算法進行匹配
+
+
+        Arguments:
+            img1 --你要在那張圖片上找
+            imgF -- 查找用圖片
+
+        Keyword Arguments:
+            ORB -- 圖像算法器 (default: {cv2.SIFT.create(1000)})
+            matcher -- 匹配器 (default: {cv2.BFMatcher()})
+            confi -- 差距值 (default:0.7)
+
+        Return: List
+            [0] List 存儲找到的點
+            [1] - > [0]KP1(包含kp&des) [1]KP2[0](包含kp&des)
+        """
+        
+        #查找用
+        KP1=cv2Tool.GetKP(imgF,SIFT=ORB)
+        #截圖
+        KP2=cv2Tool.GetKP(img1,SIFT=ORB)
+
+        if KP1[1] is None or KP2[1] is None:
+            print("沒有找到特徵")
+            return None
+        
+        matcher_bf=matcher.knnMatch(KP1[1],KP2[1],k=2)
+        
+        good=[]
+        for m,n in matcher_bf:
+            if m.distance < confi*n.distance:
+                good.append([m])
+        
+
+        Result=[
+            good,
+            [KP1,KP2],
+
+        ]
+        if len(good)>=1:
+            FindP=KP2[0][good[0][0].trainIdx].pt
+            print(f'找到的點:{FindP}')
+
+
+        print(f'找到的數量:{len(good)}')
+        
+        return Result
+        
+
+    def GetKP(img,Mask=None,SIFT=cv2.SIFT_create()):
+        """GetKP 取得關鍵點與特徵
+
+        Arguments:
+            img -- 圖片數據Image
+
+            Mask -- 指定檢測的關鍵點
+
+        Keyword Arguments:
+            SIFT -- 創建器 (default: {cv2.SIFT_create()})
+
+        Returns: List
+            [0] Keypoints 關鍵點
+
+            [1] Descriptors 特徵
+        """
+        kp,des=SIFT.detectAndCompute(img,Mask)
+
+        return [kp,des]
+
 
 class GetItem: 
     """主要進行統計加減值"""
@@ -198,7 +274,14 @@ class GetItem:
         """初始化"""
         self.Hour=0
         self.Play=0
-        self.xp={'Count':0,'Value':0}
+        self.xp={   
+                    'Count':0,
+                    '5KCount':0,
+                    '1WCount':0,
+                    '3WCount':0,
+                    '5WCount':0,
+                    'Value':0
+                }
         self.feed={'Count':0,'Value':0}
         self.CC=0
         self.Rest=False
@@ -209,12 +292,17 @@ class GetItem:
     
 
 
-    def AddXP(self,value):
+    def AddXP(self,value,Type_D='Count'):
         """
+        value -- 增加xp值
+        type -- xp字典分類(default:Count) 
+            Dict:(5W/3W/1W/5K)Count/Count
+            Ex:5WCount/3WCount..
+
         增加xp次數&給定xp
         """  
         self.xp['Value']+=value
-        self.xp['Count']+=1
+        self.xp[Type_D]+=1
 
 
     def AddFeed(self,value):
