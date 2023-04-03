@@ -3,17 +3,16 @@ import pydirectinput #用於點擊
 from pynput import keyboard,mouse #鍵盤事件用
 import time #等待用
 import os #用來取當前文件位置
-import win32gui #窗口范範圍捕抓
 import cv2 #百分比調整
 import random #隨機數
-import threading
+
 from CatFeed import *
 
 #項目位置
 ProjectPath=os.path.dirname(os.path.abspath(__file__))
 print('Project >>',ProjectPath)
 
-WebFile="C:/Users/u01/Desktop/NuclearWeb/Status.txt"
+WebFile="C:/Users/u01/Desktop/NuclearWeb/Status.json"
 """用於指定任意位置存放統計結果"""
 
 SearchWin="雷電模擬器"
@@ -34,7 +33,7 @@ Delay=3
 """
 檢測延遲
 """
-
+HourPlan=[]
 HourList={
     'Count':[],
     'Map':[
@@ -304,6 +303,7 @@ def MoreSearch(dir="Add",listT=list(["1.png","2.png"]),Name="Test",Mode_=0,Delay
 
 MoveE=[]
 Distances=[]
+WorkResize=0
 
 #鍵盤
 def press(key):
@@ -312,18 +312,23 @@ def press(key):
     鍵盤按鍵接收用
     """
     global ESCCount,AutoMode,Delay,SearchWin,ProjectPath
+    global WorkResize
+
     
-    #print(key,type(key))
     if AutoMode[0]==1:
         AutoMode[0]=0
         
-    elif key == KeySet.get('Exit'):
+    if key == KeySet.get('Exit'):
+            print(f"再按{5-ESCCount}次 結束")
             ESCCount+=1
             if ESCCount>=5:
                 print(ItemGet.Result())
                 print('結束進程')
                 os._exit(0)
-    elif key == KeySet.get('Auto'):
+    else:
+        ESCCount=0
+    
+    if key == KeySet.get('Auto'):
         if AutoMode[2]==0:
             AutoMode[2]=1
             print("啟用自動戰鬥簡易操作")
@@ -333,22 +338,31 @@ def press(key):
     elif key == KeySet.get('Point'):
         print(pyautogui.position())    
     
-    elif key == KeySet.get('TestResize'):
-
-        ScaleFW=WinTool.FWScale(Find_W=SearchWin,width=1280,height=720,tip=1)
-        ReSize=cv2Scale('Add_5.png',scale_percent=[ScaleFW[0],ScaleFW[1]],Debug=True,ReadF=True)
-        print(f"imgFile:{ReSize.get('imgFile')}")
-        FRWW=get_xy(img_path=ReSize.get('imgFile'),name=">> 測試Resize",tip=1)
-        if FRWW:
-            #計算擷取範圍
-            print(FRWW)
-            REG=((FRWW.x-FRWW.x*0.1),(FRWW.y-FRWW.y*0.1),(FRWW.x+FRWW.x*0.1),(FRWW.y+FRWW.y*0.1))
-            pyautogui.screenshot(region=REG).save(f'{ProjectPath}\\Test\\ResizeR.png')
-            cv2Tool.ShowImage(f"{ProjectPath}\\Test\\ResizeR.png","FindResult")
+    
+    if key == KeySet.get('TestResize'):
+            print(f"再按{5-WorkResize}次 運行")
+            WorkResize+=1
             
-        cv2Tool.ShowImage(ReSize.get('img'),"Resize")
+            if WorkResize>=5:
+                print("正在運行Resize結果")  
 
-    elif key == KeySet.get("-Delay"):
+                ScaleFW=WinTool.FWScale(Find_W=SearchWin,width=1280,height=720,tip=1)
+                ReSize=cv2Scale('Add_5.png',scale_percent=[ScaleFW[0],ScaleFW[1]],Debug=True,ReadF=True)
+                print(f"imgFile:{ReSize.get('imgFile')}")
+                FRWW=get_xy(img_path=ReSize.get('imgFile'),name=">> 測試Resize",tip=1)
+                if FRWW:
+                    #計算擷取範圍
+                    print(FRWW)
+                    REG=((FRWW.x-FRWW.x*0.1),(FRWW.y-FRWW.y*0.1),(FRWW.x+FRWW.x*0.1),(FRWW.y+FRWW.y*0.1))
+                    pyautogui.screenshot(region=REG).save(f'{ProjectPath}\\Test\\ResizeR.png')
+                    cv2Tool.ShowImage(f"{ProjectPath}\\Test\\ResizeR.png","FindResult")
+                    
+                cv2Tool.ShowImage(ReSize.get('img'),"Resize")
+                WorkResize=0
+            
+    else:WorkResize=0
+    
+    if key == KeySet.get("-Delay"):
         print(f"降低延遲間隔:{Delay}")
         if Delay>1:Delay=round(Delay-1)
         elif Delay>=0.2:Delay=round(Delay-0.1,1)
@@ -373,6 +387,7 @@ def press(key):
         HGet=HourGet(Debug=1 ,Maps=2)
         print(f">> 這次探險{HGet[0]}時 還可以取{HGet[1]}時")
 
+    
 
 #滑鼠
 def move(x,y):
@@ -411,7 +426,6 @@ else:
 
 
 while True:
-    if ESCCount>0:ESCCount-=1
     Position=pyautogui.position()
     print(f"""
     當前位置:{Position} 延遲:{Delay} 狀態:{AutoMode[0]}
@@ -579,7 +593,7 @@ while True:
                         MapsS=2
                 SetHour=HourGet(Maps=MapsS,Debug=1)[0]
                 
-                
+                HourPlan.append(SetHour) #紀錄使用策略
 
                 HourCount+=SetHour
                 ItemGet.Hour+=SetHour
@@ -688,17 +702,34 @@ while True:
 
             #用於更新網站根目錄特定檔案的內容
             if WebFile:
-                with open(WebFile, 'w') as f:
-                    DictR=ItemGet.Range()
-                    Range='探險數據不夠統計..'
-                    if DictR:
-                        Range=f"得到XP:{DictR.get('XP')}% 得到罐頭:{DictR.get('Feed')}%"
+                RString=""
+                AP=0
+                for i in HourPlan:
+                    if AP<=3:
+                        Add='+'
+                        if AP>=3:
+                            Add='\n'
+                            AP=0
+                        RString=f"{RString}{i}"+ Add 
 
-                    f.write(f"""
-                    E1{ItemGet.ResultH()}E2
-                    E3{Range}E4
-                    """
-                    )
+                    AP+=1
+                
+                
+                import json
+
+                DictR=ItemGet.Range()
+                Range='探險數據不夠統計..'
+                if DictR:
+                    Range=f"得到XP:{DictR.get('XP')}% 得到罐頭:{DictR.get('Feed')}%"
+
+                ResultRS={
+                    "Result":ItemGet.ResultH(),
+                    "RSCount":Range,
+                    "HourPlan":RString
+                }
+                with open(WebFile, 'w',encoding='utf-8') as f:
+                    json.dump(ResultRS,f,indent=4,ensure_ascii=False)
+                    #寫入檔案以json格式
 
 
     time.sleep(Delay)
