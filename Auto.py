@@ -26,12 +26,27 @@ Debug=0
 1 啟用測試模式(只監聽滑鼠鍵盤)
 
 2 測試戰鬥AI Region位置 以及click功能Debug
+
+3 不監聽滑鼠(為了避免斷點調試造成卡頓問題)
 """
 
 Delay=3
 """
 檢測延遲
 """
+
+HourList={
+    'Count':[],
+    'Map':[
+        [1,1,1,3,3,3,6], #<40% xps
+        [1,1,1,3,1,1,1], #40% xp
+        [1,1,1,3,3,1,3] #70% xp
+    ]
+}
+"""
+實驗安排探險策略 1+1+1+3+3+3+6 小時組
+"""
+
 KeySet={
     'Exit':keyboard.Key.esc,
     'Auto':keyboard.KeyCode.from_char('c'),
@@ -40,7 +55,8 @@ KeySet={
     '-Delay':keyboard.KeyCode.from_char('-'),
     '+Delay':keyboard.KeyCode.from_char('+'),
     'AutoDelay':keyboard.KeyCode.from_vk(99),
-    'WinRect':keyboard.KeyCode.from_char('m')
+    'WinRect':keyboard.KeyCode.from_char('m'),
+    'HourList':keyboard.KeyCode.from_char('l')
     }
 """
 按鍵快捷設定
@@ -81,6 +97,38 @@ MSearchAddState=[
 os.system("title Auto加碼多多")
 
 
+def HourGet(Maps=0,Debug=0):
+    """"
+    探險陣列
+    
+    Maps -- 選擇第幾組探險陣列
+
+    Debug -- 1 開啟調試用信息
+
+    Return -- List
+        [0]取出這次探險幾小時
+
+        [1]還有多少小時可以取(0時會補充)
+    """
+    global HourList
+    HourValue=HourList.get('Count')
+    
+    if Debug==1:
+        print(f"{HourList}:{HourValue} {type(HourValue)}")
+        print(f"{len(HourValue)} 共 {sum(HourValue)} 小時")
+
+    if len(HourValue)<=0:
+        RevList=HourList.get("Map")[Maps]
+        HourList["Count"]=RevList[::-1] #新反轉列表
+        
+        if Debug==1:print(f'策略Map已用盡 {HourList["Count"]} 使用第{Maps}組')
+        return [1,sum(HourValue)]
+
+    elif len(HourValue)>=1:
+        POP=HourList["Count"].pop()
+        print(f'LastElement:{POP}')
+        return [POP,sum(HourValue)]
+    
     
 def cv2Scale(image,scale_percent=[0.8,0.3],Debug=False,ReadF=False):
     """cv2Scale 用於重新縮放圖片
@@ -313,9 +361,15 @@ def press(key):
         FWinD=WinTool.FindW(Window=SearchWin)
         if FWinD:
             print(FWinD[2])
+
+    elif key == KeySet.get('HourList'):
+        HGet=HourGet(Debug=1 ,Maps=2)
+        print(f">> 這次探險{HGet[0]}時 還可以取{HGet[1]}時")
+
+
 #滑鼠
 def move(x,y):
-    global AutoMode,MoveE,Distances,Debug
+    global MoveE,Distances
     if len(MoveE)<2:
         MoveE.append({'x':x,'y':y})
     elif len(MoveE)>=2:
@@ -323,9 +377,12 @@ def move(x,y):
         Distances.append(distance)
         if len(Distances)>=30:
             DisSum=sum(Distances)
-            if Debug==1:print(f'10次偏差和:{DisSum}')
+
+            global Debug
+            if Debug==1:print(f'30次偏差和:{DisSum}')
             
             if DisSum>300:
+                global AutoMode
                 if AutoMode[0]==1:
                     AutoMode[0]=0
                 elif AutoMode[1]<15:
@@ -340,7 +397,10 @@ listen=keyboard.Listener(on_press=press)
 listen.start()
 #滑鼠移動檢測
 listen2=mouse.Listener(on_move=move)
-listen2.start()
+if Debug!=3: #如果再調試其他部分 建議先不要監聽滑鼠活動
+    listen2.start()
+else:
+    print("不調試滑鼠!")
 
 
 while True:
@@ -491,7 +551,7 @@ while True:
                 if LevelUP:click(LevelUP)
                 
                 if AutoMode[3][0]>0:AutoMode[3][0]-=1
-                if AutoMode[3][0]==0:
+                elif AutoMode[3][0]<=0:
                     click(CNext)
                     print("自動下一步")
                     AutoMode[3][0]=AutoMode[3][1]
@@ -503,13 +563,16 @@ while True:
                 click(AutoState)
                 time.sleep(3)
                 
-                SetHour=1
+                MapsS=0 #第幾組Map
                 if ItemGet.Play>0:
                     XPRange=ItemGet.Range().get('XP')
                     if XPRange>40:
-                        SetHour=3
+                        MapsS=1
                     elif XPRange>70:
-                        SetHour=3#暫時用3小時
+                        MapsS=2
+                SetHour=HourGet(Maps=MapsS,Debug=1)[0]
+                
+                
 
                 HourCount+=SetHour
                 ItemGet.Hour+=SetHour
@@ -584,7 +647,7 @@ while True:
 
                 xp5k=get_xy('item/xp/5000.png',"獲得xp 5000",Mode=1)    
                 if xp5k:
-                    ItemGet.AddXP(800)
+                    ItemGet.AddXP(5000,Type_D='5KCount')
                     click(GetM,Mode=1)
 
                 xp1w=get_xy('item/xp/10000.png',"獲得xp 10000",Mode=1)    
@@ -593,8 +656,10 @@ while True:
                     click(GetM,Mode=1)
                 xp3w=get_xy('item/xp/30000.png',"獲得xp 30000",Mode=1)    
                 if xp3w:
-                    ItemGet.AddXP(3000)    
-                
+                    ItemGet.AddXP(30000,Type_D='3WCount')    
+                xp5w=get_xy('item/xp/50000.png',"獲得xp 50000",Mode=1)    
+                if xp5w:
+                    ItemGet.AddXP(50000,Type_D='5WCount')    
                 
 
             Back=get_xy("Back.png","回來了",Mode=1)
