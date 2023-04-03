@@ -29,9 +29,10 @@
 # 按鍵指南
 
 * Auto.py  
-<kbd>ESC</kbd> 連續點擊5次以上可以退出進程   
+<kbd>ESC</kbd> 重複點擊5次此按鍵 可以退出進程   
 <kbd>C</kbd> 可以開關 戰鬥AI  
-<kbd>V</kbd> 可以取得鼠標位置(用來確認Region範圍用的)  
+<kbd>H</kbd> 可以取得鼠標位置(用來確認Region範圍用的)  
+<kbd>V</kbd> 重複點擊5次此按鍵 測試Resize圖片  
     <kbd>-</kbd> <kbd>+</kbd>  快捷降低/增加延遲間隔
     <kbd>Num3</kbd> 快捷降低接替間隔  
     <kbd>M</kbd> 用來取得指定窗口區域
@@ -117,16 +118,19 @@ python Auto.py
 
 ## 關於WebFile - Auto.py  
 ```
-WebFile="C:/Users/u01/Desktop/NuclearWeb/Status.txt"
+WebFile="C:/Users/u01/Desktop/NuclearWeb/Status.json"
 ```
 
 | WebFile 值 | 說明 |
 | --- | --- |
 | None | 略過寫入指定檔案 |
-| String | 要寫入的檔案路徑 |
+| String | 要寫入的檔案路徑(格式:json檔案) |
 
 用來給Siri捷徑 訪問網站下的指定檔案 獲取文字內容   
 來方便從iPad上查看統計數據
+
+>> 現在結果以JSON字典保存
+
 
 ## 關於KeySet - Auto.py
 ```
