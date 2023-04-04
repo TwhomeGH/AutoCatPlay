@@ -87,7 +87,24 @@ AutoMode=[0,15,0,[10,10],0]
 
 AutoC=0
 
-ESCCount=0 #退出按鍵計數
+KeyCount={
+    'ESC':[5,5],
+    'Resize':[5,5]
+}
+"""
+按鍵計數 - Dict
+
+| 字典值 Dict | 說明 |
+| --- | --- |
+| ESC | 結束運行 |
+| Resize | 測試重新縮放 |
+
+| 按鍵列表值 | 說明  |
+| --- | --- |
+| 0 | 初始值 |
+| 1 | 補充值 |
+"""
+
 Region=None #查找位置
 CaptureF=0 #第幾張圖
 
@@ -269,12 +286,15 @@ def get_xy(img_path=None,name="測試",tip=None,confi=0.9,regionS=None,Mode=0):
             CVScale=cv2Scale(img_path,[Scale[0],Scale[1]])
             Add=CVScale.get('imgFile')
     
-    #檢測圖片
-    if regionS:
-        Position=pyautogui.locateCenterOnScreen(image=Add,confidence=confi,region=regionS)
-    else:
-        Position=pyautogui.locateCenterOnScreen(image=Add,confidence=confi)
-    
+    try:
+        #檢測圖片
+        if regionS:
+            Position=pyautogui.locateCenterOnScreen(image=Add,confidence=confi,region=regionS)
+        else:
+            Position=pyautogui.locateCenterOnScreen(image=Add,confidence=confi)
+    except Exception:
+        print("User Control 使用者帳戶控制頁面不能進行截圖")
+        return None
 
     if Position:
         print(f"{name} 找到了:{Position}")
@@ -303,7 +323,6 @@ def MoreSearch(dir="Add",listT=list(["1.png","2.png"]),Name="Test",Mode_=0,Delay
 
 MoveE=[]
 Distances=[]
-WorkResize=0
 
 #鍵盤
 def press(key):
@@ -311,106 +330,115 @@ def press(key):
     key 接收按下的按鍵
     鍵盤按鍵接收用
     """
-    global ESCCount,AutoMode,Delay,SearchWin,ProjectPath
-    global WorkResize
+    global KeyCount,AutoMode
 
-    
     if AutoMode[0]==1:
         AutoMode[0]=0
-        
-    if key == KeySet.get('Exit'):
-            print(f"再按{5-ESCCount}次 結束")
-            ESCCount+=1
-            if ESCCount>=5:
-                print(ItemGet.Result())
-                print('結束進程')
-                os._exit(0)
-    else:
-        ESCCount=0
-    
-    if key == KeySet.get('Auto'):
-        if AutoMode[2]==0:
-            AutoMode[2]=1
-            print("啟用自動戰鬥簡易操作")
-        else:
-            AutoMode[2]=0
-            print("關閉自動戰鬥")
-    elif key == KeySet.get('Point'):
-        print(pyautogui.position())    
-    
-    
-    if key == KeySet.get('TestResize'):
-            print(f"再按{5-WorkResize}次 運行")
-            WorkResize+=1
-            
-            if WorkResize>=5:
-                print("正在運行Resize結果")  
-
-                ScaleFW=WinTool.FWScale(Find_W=SearchWin,width=1280,height=720,tip=1)
-                ReSize=cv2Scale('Add_5.png',scale_percent=[ScaleFW[0],ScaleFW[1]],Debug=True,ReadF=True)
-                print(f"imgFile:{ReSize.get('imgFile')}")
-                FRWW=get_xy(img_path=ReSize.get('imgFile'),name=">> 測試Resize",tip=1)
-                if FRWW:
-                    #計算擷取範圍
-                    print(FRWW)
-                    REG=((FRWW.x-FRWW.x*0.1),(FRWW.y-FRWW.y*0.1),(FRWW.x+FRWW.x*0.1),(FRWW.y+FRWW.y*0.1))
-                    pyautogui.screenshot(region=REG).save(f'{ProjectPath}\\Test\\ResizeR.png')
-                    cv2Tool.ShowImage(f"{ProjectPath}\\Test\\ResizeR.png","FindResult")
-                    
-                cv2Tool.ShowImage(ReSize.get('img'),"Resize")
-                WorkResize=0
-            
-    else:WorkResize=0
-    
-    if key == KeySet.get("-Delay"):
-        print(f"降低延遲間隔:{Delay}")
-        if Delay>1:Delay=round(Delay-1)
-        elif Delay>=0.2:Delay=round(Delay-0.1,1)
-
-    elif key == KeySet.get("+Delay"):
-        print(f"增加延遲間隔:{Delay}")
-        if Delay<1:Delay=round(Delay+0.1,1)
-        else:Delay=round(Delay+1)
-        
-    
     elif str(key)==str(KeySet.get("AutoDelay")):
         if AutoMode[1]>1:
             AutoMode[1]-=1
             print(f"降低接替間隔:{AutoMode[1]}")
-        
-    elif key == KeySet.get("WinRect"):
-        FWinD=WinTool.FindW(Window=SearchWin)
-        if FWinD:
-            print(FWinD[2])
 
-    elif key == KeySet.get('HourList'):
-        HGet=HourGet(Debug=1 ,Maps=2)
-        print(f">> 這次探險{HGet[0]}時 還可以取{HGet[1]}時")
+
+    if key == KeySet.get('Exit'):
+            print(f"再按{KeyCount.get('ESC')[0]}次 結束")
+            KeyCount['ESC'][0]-=1
+            if KeyCount.get('ESC')[0]<=0:
+                print(ItemGet.Result())
+                print('結束進程')
+                os._exit(0)
+    else:
+        KeyCount['ESC'][0]=KeyCount['ESC'][1] #補充值
+    
+        if key == KeySet.get('Auto'):
+            if AutoMode[2]==0:
+                AutoMode[2]=1
+                print("啟用自動戰鬥簡易操作")
+            else:
+                AutoMode[2]=0
+                print("關閉自動戰鬥")
+        elif key == KeySet.get('Point'):
+            print(pyautogui.position())    
+    
+    
+        if key == KeySet.get('TestResize'):
+                print(f"再按{KeyCount.get('Resize')[0]}次 運行")
+                KeyCount["Resize"][0]-=1
+                
+                if KeyCount["Resize"][0]<=0:
+                    global ProjectPath,SearchWin
+                    print("正在運行Resize結果")  
+
+                    ScaleFW=WinTool.FWScale(Find_W=SearchWin,width=1280,height=720,tip=1)
+                    ReSize=cv2Scale('Add_5.png',scale_percent=[ScaleFW[0],ScaleFW[1]],Debug=True,ReadF=True)
+                    print(f"imgFile:{ReSize.get('imgFile')}")
+                    FRWW=get_xy(img_path=ReSize.get('imgFile'),name=">> 測試Resize",tip=1)
+                    if FRWW:
+                        #計算擷取範圍
+                        print(FRWW)
+                        REG=((FRWW.x-FRWW.x*0.1),(FRWW.y-FRWW.y*0.1),(FRWW.x+FRWW.x*0.1),(FRWW.y+FRWW.y*0.1))
+                        pyautogui.screenshot(region=REG).save(f'{ProjectPath}\\Test\\ResizeR.png')
+                        cv2Tool.ShowImage(f"{ProjectPath}\\Test\\ResizeR.png","FindResult")
+                        
+                    cv2Tool.ShowImage(ReSize.get('img'),"Resize")
+                    
+                    KeyCount["Resize"][0]=KeyCount["Resize"][1]
+                
+        else:
+            KeyCount["Resize"][0]=KeyCount["Resize"][1]
+
+        global Delay
+        if key == KeySet.get("-Delay"):
+            print(f"降低延遲間隔:{Delay}")
+            if Delay>1:Delay=round(Delay-1)
+            elif Delay>=0.2:Delay=round(Delay-0.1,1)
+
+        elif key == KeySet.get("+Delay"):
+            print(f"增加延遲間隔:{Delay}")
+            if Delay<1:Delay=round(Delay+0.1,1)
+            else:Delay=round(Delay+1)
+        
+        elif key == KeySet.get("WinRect"):
+            FWinD=WinTool.FindW(Window=SearchWin)
+            if FWinD:
+                print(FWinD[2])
+
+        elif key == KeySet.get('HourList'):
+            HGet=HourGet(Debug=1 ,Maps=2)
+            print(f">> 這次探險{HGet[0]}時 還可以取{HGet[1]}時")
 
     
 
 #滑鼠
 def move(x,y):
-    global MoveE,Distances
+    global MoveE
     if len(MoveE)<2:
         MoveE.append({'x':x,'y':y})
     elif len(MoveE)>=2:
-        distance = round(WinTool.get_distance(MoveE[0], MoveE[1]))
+        global Distances
+        distance = WinTool.get_distance(MoveE[0], MoveE[1])
         Distances.append(distance)
         if len(Distances)>=30:
             DisSum=sum(Distances)
 
             global Debug
-            if Debug==1:print(f'30次偏差和:{DisSum}')
+
+            RRAND=random.randrange(10,25)
+
+            if Debug==1:
+                print(f'30次偏差和:{DisSum}')
+                print(f"將重新取得{RRAND}個元素")
             
-            if DisSum>300:
+            if DisSum>=330:
                 global AutoMode
                 if AutoMode[0]==1:
                     AutoMode[0]=0
                 elif AutoMode[1]<15:
                     AutoMode[1]=15
             
-            Distances.clear()
+            
+            for i in range(RRAND):
+                Distances.pop()
         MoveE.clear()
 
 
@@ -429,7 +457,7 @@ while True:
     Position=pyautogui.position()
     print(f"""
     當前位置:{Position} 延遲:{Delay} 狀態:{AutoMode[0]}
-    自動下一步:{AutoMode[3]} 接替於:{AutoMode[1]} ESC:{ESCCount}
+    自動下一步:{AutoMode[3]} 接替於:{AutoMode[1]}
     """)
     #LDOperationRecorderWindow 操作錄製窗口
     #LDPlayerMainFrame 主窗口    
@@ -530,7 +558,7 @@ while True:
 
 
     elif AutoMode[0]==1:
-        if Delay>=60:
+        if Delay>=30:
             Delay-=3
         
         Work1=get_xy("Work.png","加碼多多 正在探險",Mode=1)
@@ -696,7 +724,7 @@ while True:
                 if BackBaseC:click(BackBaseC)
             
         else:
-            if Delay<120:
+            if Delay<60:
                 Delay+=1
             print("進入節能模式 頻率降低")
 
