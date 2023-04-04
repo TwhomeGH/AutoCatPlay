@@ -21,7 +21,7 @@ class WinTool:
         """
         x1, y1 = point1['x'], point1['y']
         x2, y2 = point2['x'], point2['y']
-        return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+        return round(math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2))
 
     def Thread(func,argsR=None,Mode=0):
         """Thread 運行新線程
@@ -324,7 +324,7 @@ class GetItem:
     def Result(self):
         """獲得統計數量"""
         return f"""
-        已探險{self.Play}
+        已探險{self.Play}次
         獲得 xp:{self.xp['Count']}次 +{self.xp['Value']} 貓罐頭:{self.feed['Count']}次 +{self.feed['Value']}
         共{self.Hour}小時 元寶 得到:{self.CC}個
         """
