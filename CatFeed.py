@@ -211,7 +211,9 @@ class cv2Tool:
 
         Return: List
             [0] List 存儲找到的點
-            [1] - > [0]KP1(包含kp&des) [1]KP2[0](包含kp&des)
+
+            [1] -> [0]KP1 [1] KP2 (包含kp&des)
+
         """
         
         #查找用
