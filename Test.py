@@ -24,12 +24,10 @@ img=os.path.join(TestFile,"ORBTest.png")
 """螢幕畫面"""
 
 
-
 ORB_Root=os.path.join(File_Root,"img")
 """專用測試資料夾ORB"""
 
 #檢測圖
-Num=2
 imgFind=os.path.join(ORB_Root,f"Gold.png") 
 imgOut=numpy.zeros_like(img,dtype=numpy.float32) #輸出結果用
 
@@ -38,37 +36,12 @@ imgOut=numpy.zeros_like(img,dtype=numpy.float32) #輸出結果用
 
 imgFindR=cv2.imread(imgFind)
 
-ORB=cv2.SIFT.create(
-    1000
-)
-
-
-matcher=cv2.BFMatcher()
-
 Rect=WinTool.FindW(Window='雷電模擬器')
 
-HourP=[1,2,3,3,3,6,3,3]
 
 while True:
     #截圖
-    
-    RNum=1
-    String=f"R{RNum}"
-    AP=0
-    for i in HourP:
 
-        if AP<=3:
-            Add='+'
-            if AP>=3:
-                Add=f'R{RNum}\nR{RNum+1}'
-                RNum+=1
-                AP=0
-            String=f"{String}{i}"+ Add 
-
-        AP+=1
-
-    print(String)
-    continue
     if Rect is None:
         continue
     RectL=Rect[2] 
@@ -79,37 +52,34 @@ while True:
     
     img1=cv2.imread(img)
     
-    #比較用圖
-    #imgFindR=cv2.imread(os.path.join(ORB_Root,f"ADD_{Num}.png"))
     
     SIFTRes=cv2Tool.Search(img1,imgFindR)
     print(f"{len(SIFTRes[0])}")
-    #if len(SIFTRes)>=1:
-        #FindP=KP2[0][good[0][0].trainIdx].pt
-    #     print(f'找到的點:{FindP}')
-    #     imgWH=(RectL[0],RectL[1])
-    #     Find_T=(int(FindP[0]*0.95),int(FindP[1]*0.95),int(FindP[0]*0.1),int(FindP[1]*0.2))
-
-    #     PFP=(imgWH[0]+Find_T[0],imgWH[1]+Find_T[1],int(Find_T[2]),int(Find_T[3]))
+    if len(SIFTRes[0])>=1:
+        KP1=SIFTRes[1][0]
+        KP2=SIFTRes[1][1]
+        FindP=KP2[0][SIFTRes[0][0][0].trainIdx].pt
+        print(f'找到的點:{FindP}')
         
-    #     print(f'Region:{PFP}')
-    #     pyautogui.screenshot(region=PFP).save(f'{TestFile}\\ResF.png')
-    #     ResS=cv2.imread(f'{TestFile}\\ResF.png')
-    #     cv2.circle(ResS, (int(FindP[0])-Find_T[0],int(FindP[1])-Find_T[1]),5,(151, 204, 255),-1)
+        imgWH=(RectL[0],RectL[1])
+        Find_T=(int(FindP[0]*0.95),int(FindP[1]*0.95),int(FindP[0]*0.1),int(FindP[1]*0.2))
+
+        PFP=(imgWH[0]+Find_T[0],imgWH[1]+Find_T[1],int(Find_T[2]),int(Find_T[3]))
         
-    #     cv2Tool.ShowImage(ResS,'FindResult')
+        print(f'Region:{PFP}')
+        pyautogui.screenshot(region=PFP).save(f'{TestFile}\\ResF.png')
+        ResS=cv2.imread(f'{TestFile}\\ResF.png')
+        cv2.circle(ResS, (int(FindP[0])-Find_T[0],int(FindP[1])-Find_T[1]),5,(151, 204, 255),-1)
+        
+        cv2Tool.ShowImage(ResS,'FindResult')
 
+        img2 = cv2.drawMatchesKnn(imgFindR, KP1[0],img1,KP2[0], SIFTRes[0],matchColor=(255, 199, 110),outImg=imgOut,flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+        cv2.imwrite(f"{TestFile}\\SQIF.png",img2)
 
-    # print(f'找到的數量:{len(good)}')
-    # img2 = cv2.drawMatchesKnn(imgFindR, KP1[0],img1,KP2[0], good,matchColor=(255, 199, 110),outImg=imgOut,flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
-    # cv2.imwrite(f"{TestFile}\\SQIF.png",img2)
+        imgR=cv2.resize(img2, (960,540))
 
-    # imgR=cv2.resize(img2, (960,540))
-
-    # cv2Tool.ShowImage(imgR,"keypoint")
+        cv2Tool.ShowImage(imgR,"keypoint")
     
-    # good.clear()
-    log(f":{imgFind}")
     time.sleep(1)
 
 
