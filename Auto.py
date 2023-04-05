@@ -20,7 +20,7 @@ SearchWin="雷電模擬器"
 查找你需要的窗口
 """
 
-Debug=0
+Debug=1
 """
 1 啟用測試模式(只監聽滑鼠鍵盤)
 
@@ -68,11 +68,13 @@ KeySet={
 按鍵快捷設定
 """
 
-AutoMode=[0,15,0,[10,10],0] 
+AutoMode=[0,[15,15],0,[10,10],0] 
 """ 用於狀態確定/計數
 
 [0]自動加碼多多狀態
 [1]接替倒數
+
+[1] -> [0]初始值 [1]默認刷新值
 
 [2]戰鬥AI狀態
 [3]自動下一步
@@ -120,6 +122,9 @@ MSearchAddState=[
 os.system("title Auto加碼多多")
 
 
+def RunCheck():
+    print('未開發函式 - 待完善')
+
 def HourGet(Maps=0,Debug=0):
     """"
     探險陣列
@@ -151,8 +156,7 @@ def HourGet(Maps=0,Debug=0):
         POP=HourList["Count"].pop()
         print(f'LastElement:{POP}')
         return [POP,sum(HourValue)]
-    
-    
+        
 def cv2Scale(image,scale_percent=[0.8,0.3],Debug=False,ReadF=False):
     """cv2Scale 用於重新縮放圖片
 
@@ -243,28 +247,28 @@ def cv2Scale(image,scale_percent=[0.8,0.3],Debug=False,ReadF=False):
     if ReadF:Result["img"]=resizeR
     return Result
 
-def click(xy,x1r=0,num=1,Delay=0,Mode=0):
+def click(xy,x1r=0,num=1,CDelay=0,Mode=0):
     """
     xy 位置
     x1r x偏易增減
     num 次數
-    Delay 間隔
+    CDelay 間隔
     Mode 1 啟用點擊時 更新接替間隔()
     """
     for i in range(num):
         pydirectinput.mouseDown(xy[0]+x1r,xy[1])
         pydirectinput.mouseUp(xy[0]+x1r,xy[1]) 
         
-        if Delay==0:continue
+        if CDelay==0:continue
         else:
-            Delay=random.randint(1,2)/10+Delay
+            CDelay=random.randint(1,2)/10+CDelay
         
-        time.sleep(Delay)
+        time.sleep(CDelay)
 
     if Mode==1:
         global AutoMode,Debug
-        if AutoMode[1]>3:AutoMode[1]=3
-        if Debug==2:print(f"自動點擊間隔更新! {AutoMode[1]}")
+        if AutoMode[1][0]<3:AutoMode[1][0]+=3
+        if Debug==2:print(f"自動點擊間隔更新! {AutoMode[1][0]}")
         #避面自動點擊 誤判使用者活動
 
 def get_xy(img_path=None,name="測試",tip=None,confi=0.9,regionS=None,Mode=0):
@@ -302,18 +306,18 @@ def get_xy(img_path=None,name="測試",tip=None,confi=0.9,regionS=None,Mode=0):
     elif tip==1:
         print(f"{name} 沒有")
 
-def MoreSearch(dir="Add",listT=list(["1.png","2.png"]),Name="Test",Mode_=0,Delay=0.5):
+def MoreSearch(dir="Add",listT=list(["1.png","2.png"]),Name="Test",Mode_=0,MDelay=0.5):
     """
     dir 設置所處資料夾
     listT ['1.png','2.png'] 多張查找列表
     Name 找到的名稱提示
     Mode_ 1 啟用動態縮放模式
-    Delay 查找間隔秒數
+    MDelay 查找間隔秒數
     """
     
     for i in listT:
         Num=listT.index(i)
-        time.sleep(Delay)
+        time.sleep(MDelay)
         FindListT=get_xy(f"{dir}\\{listT[Num]}",Name,Mode=Mode_)
         if FindListT:
             return FindListT
@@ -332,12 +336,14 @@ def press(key):
     """
     global KeyCount,AutoMode
 
-    if AutoMode[0]==1:
-        AutoMode[0]=0
+    if AutoMode[1][0]<=5:
+        AutoMode[1][0]=AutoMode[1][1]
+        if AutoMode[0]==1:AutoMode[0]=0
+
     elif str(key)==str(KeySet.get("AutoDelay")):
-        if AutoMode[1]>1:
-            AutoMode[1]-=1
-            print(f"降低接替間隔:{AutoMode[1]}")
+        if AutoMode[1][0]>1:
+            AutoMode[1][0]-=1
+            print(f"降低接替間隔:{AutoMode[1][0]}")
 
 
     if key == KeySet.get('Exit'):
@@ -431,22 +437,41 @@ def move(x,y):
             
             if DisSum>=330:
                 global AutoMode
-                if AutoMode[0]==1:
-                    AutoMode[0]=0
-                elif AutoMode[1]<15:
-                    AutoMode[1]=15
+                
+                if AutoMode[1][0]<=5:
+                    AutoMode[1][0]=AutoMode[1][1]
+                    if AutoMode[0]==1:AutoMode[0]=0
+                    if Debug==1:print(f"刷新值[滑鼠移動]:{AutoMode[1][0]}")
             
             
             for i in range(RRAND):
                 Distances.pop()
         MoveE.clear()
 
+def mclick(k1,k2,k3,k4):
+    """
+    k1&k2 - 滑鼠x,y位置
+
+    k3 - 按下按鍵
+
+    k4 - 是否正按下 
+    """
+    global Debug
+    if Debug==1:
+        print((k1,k2),k3,k4,type(k4))
+    if k4:
+        global AutoMode
+        if AutoMode[1][0]<=5:
+            AutoMode[1][0]=AutoMode[1][1]
+
+            if Debug==1:print(f"刷新值[滑鼠點擊]:{AutoMode[1][0]}")
+
 
 #鍵盤按鍵接收
 listen=keyboard.Listener(on_press=press)
 listen.start()
 #滑鼠移動檢測
-listen2=mouse.Listener(on_move=move)
+listen2=mouse.Listener(on_move=move, on_click=mclick)
 if Debug!=3: #如果再調試其他部分 建議先不要監聽滑鼠活動
     listen2.start()
 else:
@@ -457,7 +482,7 @@ while True:
     Position=pyautogui.position()
     print(f"""
     當前位置:{Position} 延遲:{Delay} 狀態:{AutoMode[0]}
-    自動下一步:{AutoMode[3]} 接替於:{AutoMode[1]}
+    自動下一步:{AutoMode[3]} 接替於:{AutoMode[1][0]}
     """)
     #LDOperationRecorderWindow 操作錄製窗口
     #LDPlayerMainFrame 主窗口    
@@ -467,11 +492,11 @@ while True:
         time.sleep(Delay)
         continue
     
-    if AutoMode[1]<=0:
+    if AutoMode[1][0]<=0:
         AutoMode[0]=1
-        AutoMode[1]=5
+        AutoMode[1][0]=AutoMode[1][1]
         
-    elif AutoMode[1]>0:AutoMode[1]-=1
+    else:AutoMode[1][0]-=1
     
     
     HasRun=get_xy('HasRun.png',"正在遊戲中")    
@@ -558,12 +583,12 @@ while True:
 
 
     elif AutoMode[0]==1:
-        if Delay>=30:
-            Delay-=3
+        if Delay>3:
+            Delay-=1
         
         Work1=get_xy("Work.png","加碼多多 正在探險",Mode=1)
         if Work1 == None: #非探險
-            CNext=get_xy("Select\\NextCheck.png","可下一步",Mode=1)
+            
 
             SelectS=get_xy("SelectS.png","選項界面",Mode=1)
             if SelectS==None:
@@ -577,9 +602,8 @@ while True:
                 if Addd:
                     click(Addd)
             
-
+            CNext=get_xy("Select\\NextCheck.png","可下一步",Mode=1)
             if CNext:
-                Delay=1
                 Card=get_xy("item\\Card.png","獲得貓咪卷")
                 if Card:
                     time.sleep(1)
