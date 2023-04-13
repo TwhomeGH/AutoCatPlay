@@ -20,7 +20,7 @@ SearchWin="雷電模擬器"
 查找你需要的窗口
 """
 
-Debug=3
+Debug=0
 """
 1 啟用測試模式(只監聽滑鼠鍵盤)
 
@@ -338,9 +338,10 @@ def press(key):
     """
     global KeyCount,AutoMode
 
-    if AutoMode[1][0]<=5:
+    if AutoMode[0]==1:
+        AutoMode[0]=0
         AutoMode[1][0]=AutoMode[1][1]
-        if AutoMode[0]==1:AutoMode[0]=0
+        
 
     elif str(key)==str(KeySet.get("AutoDelay")):
         if AutoMode[1][0]>1:
@@ -420,43 +421,40 @@ def press(key):
             click(xy,Mode=1)
     
 
-MoveTest=True
+
 #滑鼠
 def move(x,y):
-    global MoveE,MoveTest
+    global MoveE
 
-    if MoveTest:
-        if len(MoveE)<2:
-            MoveE.append({'x':x,'y':y})
-        elif len(MoveE)>=2:
-            global Distances
-            distance = WinTool.get_distance(MoveE[0], MoveE[1])
-            Distances.append(distance)
-            if len(Distances)>=30:
-                DisSum=sum(Distances)
+    if len(MoveE)<2:
+        MoveE.append({'x':x,'y':y})
+    elif len(MoveE)>=2:
+        global Distances
+        distance = WinTool.get_distance(MoveE[0], MoveE[1])
+        Distances.append(distance)
+        if len(Distances)>=30:
+            DisSum=sum(Distances)
 
-                global Debug
+            global Debug
 
-                RRAND=random.randrange(10,25)
+            RRAND=random.randrange(5,10)
 
-                if Debug==1:
-                    print(f'30次偏差和:{DisSum}')
-                    print(f"將重新取得{RRAND}個元素")
+            if Debug==1:
+                print(f'30次偏差和:{DisSum}')
+                print(f"將重新取得{RRAND}個元素")
+            
+            if DisSum>=330:
+                global AutoMode
                 
-                if DisSum>=330:
-                    global AutoMode
-                    
-                    if AutoMode[1][0]<=5:
-                        AutoMode[1][0]=AutoMode[1][1]
-                        if AutoMode[0]==1:AutoMode[0]=0
-                        if Debug==1:print(f"刷新值[滑鼠移動]:{AutoMode[1][0]}")
-                
-                
-                for i in range(RRAND):
-                    Distances.pop()
-            MoveE.clear()
-    else:
-        print("停用滑鼠移動檢測")
+                if AutoMode[1][0]<=5:
+                    AutoMode[1][0]=AutoMode[1][1]
+                    if AutoMode[0]==1:AutoMode[0]=0
+                    if Debug==1:print(f"刷新值[滑鼠移動]:{AutoMode[1][0]}")
+            
+            
+            for i in range(RRAND):
+                Distances.pop()
+        MoveE.clear()
 
 def mclick(k1,k2,k3,k4):
     """
@@ -466,20 +464,18 @@ def mclick(k1,k2,k3,k4):
 
     k4 - 是否正按下 
     """
-    global Debug,MoveTest
+    global Debug
     
     if Debug==1:
         print((k1,k2),k3,k4,type(k4))
-    if MoveTest:
-        if k4:
-            global AutoMode
-            if AutoMode[1][0]<=5:
-                AutoMode[1][0]=AutoMode[1][1]
-                if AutoMode[0]==1:AutoMode[0]=0
 
-                if Debug==1:print(f"刷新值[滑鼠點擊]:{AutoMode[1][0]}")
-    else:
-        print("停用滑鼠點擊檢測")
+    if k4:
+        global AutoMode
+        AutoMode[1][0]=AutoMode[1][1]
+        if AutoMode[0]==1:AutoMode[0]=0
+
+        if Debug==1:print(f"刷新值[滑鼠點擊]:{AutoMode[1][0]}")
+
 
 #鍵盤按鍵接收
 Keylisten=keyboard.Listener(on_press=press)
@@ -632,7 +628,7 @@ while True:
 
     elif AutoMode[0]==1:
         if Delay>3:
-            Delay-=1
+            Delay-=3
         
         Work1=get_xy("Work.png","加碼多多 正在探險",Mode=1)
         if Work1 == None: #非探險
@@ -704,7 +700,6 @@ while True:
                     time.sleep(3)
                     OK=get_xy("Select\\Yes.png","確定",Mode=1)
                     if OK:
-                        Delay=10
                         click(OK,Mode=1)
                         ItemGet.Play+=1
 
@@ -718,7 +713,7 @@ while True:
             
             Next=get_xy("Select\\Next.png","下一步",Mode=1)
             if Next:
-                if Delay>=3:Delay=1
+                if Delay>3:Delay-=3
                 click(Next,Mode=1)
             GetM=get_xy("Get3.png","得到物品",Mode=1)    
             if GetM:
@@ -797,7 +792,7 @@ while True:
             
         else:
             if Delay<60:
-                Delay+=1
+                Delay+=Delay
             print("進入節能模式 頻率降低")
 
             #用於更新網站根目錄特定檔案的內容
