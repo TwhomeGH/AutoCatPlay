@@ -20,7 +20,7 @@ SearchWin="雷電模擬器"
 查找你需要的窗口
 """
 
-Debug=1
+Debug=3
 """
 1 啟用測試模式(只監聽滑鼠鍵盤)
 
@@ -266,10 +266,12 @@ def click(xy,x1r=0,num=1,CDelay=0,Mode=0):
         time.sleep(CDelay)
 
     if Mode==1:
-        global AutoMode,Debug
-        if AutoMode[1][0]<3:AutoMode[1][0]+=3
-        if Debug==2:print(f"自動點擊間隔更新! {AutoMode[1][0]}")
-        #避面自動點擊 誤判使用者活動
+        if Mouselisten.is_alive():
+            Mouselisten.stop()
+            print("暫停滑鼠漸監聽")
+        if Keylisten.is_alive():
+            Keylisten.stop()
+            print("暫停鍵盤監聽")
 
 def get_xy(img_path=None,name="測試",tip=None,confi=0.9,regionS=None,Mode=0):
     """
@@ -412,41 +414,49 @@ def press(key):
         elif key == KeySet.get('HourList'):
             HGet=HourGet(Debug=1 ,Maps=2)
             print(f">> 這次探險{HGet[0]}時 還可以取{HGet[1]}時")
-
+        elif key == keyboard.KeyCode.from_char("p"):
+            print("測試click Mode 1")
+            xy=pyautogui.position()
+            click(xy,Mode=1)
     
 
+MoveTest=True
 #滑鼠
 def move(x,y):
-    global MoveE
-    if len(MoveE)<2:
-        MoveE.append({'x':x,'y':y})
-    elif len(MoveE)>=2:
-        global Distances
-        distance = WinTool.get_distance(MoveE[0], MoveE[1])
-        Distances.append(distance)
-        if len(Distances)>=30:
-            DisSum=sum(Distances)
+    global MoveE,MoveTest
 
-            global Debug
+    if MoveTest:
+        if len(MoveE)<2:
+            MoveE.append({'x':x,'y':y})
+        elif len(MoveE)>=2:
+            global Distances
+            distance = WinTool.get_distance(MoveE[0], MoveE[1])
+            Distances.append(distance)
+            if len(Distances)>=30:
+                DisSum=sum(Distances)
 
-            RRAND=random.randrange(10,25)
+                global Debug
 
-            if Debug==1:
-                print(f'30次偏差和:{DisSum}')
-                print(f"將重新取得{RRAND}個元素")
-            
-            if DisSum>=330:
-                global AutoMode
+                RRAND=random.randrange(10,25)
+
+                if Debug==1:
+                    print(f'30次偏差和:{DisSum}')
+                    print(f"將重新取得{RRAND}個元素")
                 
-                if AutoMode[1][0]<=5:
-                    AutoMode[1][0]=AutoMode[1][1]
-                    if AutoMode[0]==1:AutoMode[0]=0
-                    if Debug==1:print(f"刷新值[滑鼠移動]:{AutoMode[1][0]}")
-            
-            
-            for i in range(RRAND):
-                Distances.pop()
-        MoveE.clear()
+                if DisSum>=330:
+                    global AutoMode
+                    
+                    if AutoMode[1][0]<=5:
+                        AutoMode[1][0]=AutoMode[1][1]
+                        if AutoMode[0]==1:AutoMode[0]=0
+                        if Debug==1:print(f"刷新值[滑鼠移動]:{AutoMode[1][0]}")
+                
+                
+                for i in range(RRAND):
+                    Distances.pop()
+            MoveE.clear()
+    else:
+        print("停用滑鼠移動檢測")
 
 def mclick(k1,k2,k3,k4):
     """
@@ -456,34 +466,55 @@ def mclick(k1,k2,k3,k4):
 
     k4 - 是否正按下 
     """
-    global Debug
+    global Debug,MoveTest
+    
     if Debug==1:
         print((k1,k2),k3,k4,type(k4))
-    if k4:
-        global AutoMode
-        if AutoMode[1][0]<=5:
-            AutoMode[1][0]=AutoMode[1][1]
+    if MoveTest:
+        if k4:
+            global AutoMode
+            if AutoMode[1][0]<=5:
+                AutoMode[1][0]=AutoMode[1][1]
+                if AutoMode[0]==1:AutoMode[0]=0
 
-            if Debug==1:print(f"刷新值[滑鼠點擊]:{AutoMode[1][0]}")
-
+                if Debug==1:print(f"刷新值[滑鼠點擊]:{AutoMode[1][0]}")
+    else:
+        print("停用滑鼠點擊檢測")
 
 #鍵盤按鍵接收
-listen=keyboard.Listener(on_press=press)
-listen.start()
+Keylisten=keyboard.Listener(on_press=press)
+Keylisten.start()
 #滑鼠移動檢測
-listen2=mouse.Listener(on_move=move, on_click=mclick)
+Mouselisten=mouse.Listener(on_move=move, on_click=mclick)
 if Debug!=3: #如果再調試其他部分 建議先不要監聽滑鼠活動
-    listen2.start()
+    Mouselisten.start()
 else:
     print("不調試滑鼠!")
+
+ListenResume=[10,10]
+
+
 
 
 while True:
     Position=pyautogui.position()
-    print(f"""
-    當前位置:{Position} 延遲:{Delay} 狀態:{AutoMode[0]}
-    自動下一步:{AutoMode[3]} 接替於:{AutoMode[1][0]}
-    """)
+    DictText={
+        "Position":Position,
+        "Delay":Delay,
+        "AutoMode":AutoMode,
+        "MListen":Mouselisten.is_alive(),
+        "KListen":Keylisten.is_alive(),
+        "Time":WinTool.NowTime()
+    }
+    DisplayText=[
+        "當前位置:{Position} 延遲:{Delay} 狀態:{AutoMode[0]}",
+        "自動下一步{AutoMode[3]} 接替於:{AutoMode[1][0]}",
+        "M:{MListen} Key:{KListen}",
+        "-- {Time}"
+    ]
+    DisplayText.insert(0,"="*len(DisplayText[0]))
+    DisplayText.append("="*len(DisplayText[0]))
+    print("\n".join(DisplayText).format_map(DictText))
     #LDOperationRecorderWindow 操作錄製窗口
     #LDPlayerMainFrame 主窗口    
     
@@ -492,6 +523,23 @@ while True:
         time.sleep(Delay)
         continue
     
+    if not Keylisten.is_alive() or not Mouselisten.is_alive():
+        print(f"鍵盤/滑鼠 監聽於:{ListenResume[0]}秒後啟用")
+        ListenResume[0]-=Delay
+    if ListenResume[0]<1:
+        ListenResume[0]=ListenResume[1]
+        #建立新的監聽
+        if not Keylisten.is_alive():
+            Keylisten=keyboard.Listener(on_press=press)
+            Keylisten.start()
+        elif not Mouselisten.is_alive():    
+            if Debug==3:
+                print(f"調試模式:{Debug} 不啟用滑鼠")
+                continue
+            Mouselisten=mouse.Listener(on_move=move, on_click=mclick)
+            Mouselisten.start()
+
+
     if AutoMode[1][0]<=0:
         AutoMode[0]=1
         AutoMode[1][0]=AutoMode[1][1]
@@ -621,11 +669,11 @@ while True:
                             click(OKColor)
                 
                 LevelUP=get_xy("Select\\LevelUP.png","加碼多多等級提升",Mode=1)
-                if LevelUP:click(LevelUP)
+                if LevelUP:click(LevelUP,Mode=1)
                 
                 if AutoMode[3][0]>0:AutoMode[3][0]-=1
                 elif AutoMode[3][0]<=0:
-                    click(CNext)
+                    click(CNext,Mode=1)
                     print("自動下一步")
                     AutoMode[3][0]=AutoMode[3][1]
                     time.sleep(3)
