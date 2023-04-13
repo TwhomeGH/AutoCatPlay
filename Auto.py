@@ -634,7 +634,14 @@ while True:
         
         Work1=get_xy("Work.png","加碼多多 正在探險",Mode=1)
         if Work1 == None: #非探險
-            
+            ActiveWin=WinTool.CheckActiveWindow()
+            if ActiveWin:
+                CheckWin=WinTool.FindW(Window=SearchWin)
+                if CheckWin:
+                    if CheckWin[3] == ActiveWin.get("Handle"):
+                        print(f"前台窗口匹配:{CheckWin[1]}")
+                        if Delay>20:Delay-=20
+            if Delay>3:Delay-=3
 
             SelectS=get_xy("SelectS.png","選項界面",Mode=1)
             if SelectS==None:
