@@ -449,9 +449,9 @@ def move(x,y):
             if DisSum>=330:
                 global AutoMode
                 
-                if AutoMode[1][0]<=5:
+                if AutoMode[0]==1:
+                    AutoMode[0]=0
                     AutoMode[1][0]=AutoMode[1][1]
-                    if AutoMode[0]==1:AutoMode[0]=0
                     if Debug==1:print(f"刷新值[滑鼠移動]:{AutoMode[1][0]}")
             
             
@@ -474,10 +474,11 @@ def mclick(k1,k2,k3,k4):
 
     if k4:
         global AutoMode
-        AutoMode[1][0]=AutoMode[1][1]
-        if AutoMode[0]==1:AutoMode[0]=0
-
-        if Debug==1:print(f"刷新值[滑鼠點擊]:{AutoMode[1][0]}")
+        if AutoMode[0]==1:
+            AutoMode[0]=0
+            AutoMode[1][0]=AutoMode[1][1]
+        
+            if Debug==1:print(f"刷新值[滑鼠點擊]:{AutoMode[1][0]}")
 
 
 #鍵盤按鍵接收
@@ -543,7 +544,7 @@ while True:
         AutoMode[0]=1
         AutoMode[1][0]=AutoMode[1][1]
         
-    else:AutoMode[1][0]-=1
+    else:AutoMode[1][0]-=Delay
     
     
     HasRun=get_xy('HasRun.png',"正在遊戲中")    
