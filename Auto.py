@@ -311,7 +311,7 @@ def get_xy(img_path=None,name="測試",tip=None,confi=0.9,regionS=None,Mode=0):
     elif tip==1:
         print(f"{name} 沒有")
 
-def MoreSearch(dir="Add",listT=list(["1.png","2.png"]),Name="Test",Mode_=0,MDelay=0.5):
+def MoreSearch(dir="Add",listT=list(["1.png","2.png"]),Name="Test",Mode_=0,MDelay=1):
     """
     dir 設置所處資料夾
     listT ['1.png','2.png'] 多張查找列表
@@ -403,7 +403,7 @@ def press(key):
         if key == KeySet.get("-Delay"):
             print(f"降低延遲間隔:{Delay}")
             if Delay>1:Delay=round(Delay-1)
-            elif Delay>=0.2:Delay=round(Delay-0.1,1)
+            elif Delay>=0.1:Delay=round(Delay-0.1,1)
 
         elif key == KeySet.get("+Delay"):
             print(f"增加延遲間隔:{Delay}")
@@ -630,8 +630,6 @@ while True:
 
 
     elif AutoMode[0]==1:
-        if Delay>3:
-            Delay-=3
         
         Work1=get_xy("Work.png","加碼多多 正在探險",Mode=1)
         if Work1 == None: #非探險
@@ -726,7 +724,7 @@ while True:
             else:
                 Next=get_xy("Select\\Next.png","下一步",Mode=1)
                 if Next:
-                    if Delay>1:Delay=1
+                    if Delay>1:Delay-=1
 
                     for i in range(10): #檢查10次
                         GetM=get_xy("Get3.png","得到物品",Mode=1)
@@ -812,7 +810,8 @@ while True:
         else:
             if Delay<60:
                 Delay+=Delay
-            print("進入節能模式 頻率降低")
+
+            print(f"進入節能模式 頻率降低 Delay:{Delay}")
 
             #用於更新網站根目錄特定檔案的內容
             if WebFile:
