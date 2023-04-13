@@ -131,9 +131,11 @@ class WinTool:
                 "Text":WindowT,
                 "Len":WindowLen,
                 "Class":win32gui.GetClassName(ActWindow),
-                "Rect":win32gui.GetWindowRect(ActWindow)
+                "Rect":win32gui.GetWindowRect(ActWindow),
+                "Handle":ActWindow
         }
         return Result
+
 
 
 
