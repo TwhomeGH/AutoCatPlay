@@ -335,7 +335,7 @@ def get_xy(img_path=None,name="測試",tip=None,confi=0.9,regionS=None,Mode=0):
                 
                 CheckNum=0
                 
-                for i in range(5):
+                for iR in range(5):
                     for i in FindList:
                         if i.endswith(".png"):
                             CheFile=os.path.join(ProjectPath,"Get",i)
