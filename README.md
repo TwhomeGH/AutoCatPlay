@@ -87,6 +87,7 @@ python Auto.py
 > Screen.txt 是關於截圖時 窗口區域信息
 > 這是我打算自動蒐集得到物品樣本用的
 
+* Require 依賴庫文件 都放在這個資料夾
 * Shot 這是使用Capture截取下來的圖片存儲位置
 * img 主要查找用圖片存放
 
@@ -94,8 +95,8 @@ python Auto.py
 
 # 依賴庫Requirements:
 
-
-## 可以使用此文件->requirements.txt
+## 依賴庫文件 都放到Require文件夾裡的
+## 可以使用此文件-> Require/requirements.txt
 - PyAutoGUI==0.9.53
 - pillow==9.4.0 
 > PyAutoGUI需要
