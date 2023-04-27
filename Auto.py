@@ -20,7 +20,7 @@ SearchWin="雷電模擬器"
 查找你需要的窗口
 """
 
-Debug=0
+Debug=3
 """
 1 啟用測試模式(只監聽滑鼠鍵盤)
 
@@ -307,6 +307,57 @@ def get_xy(img_path=None,name="測試",tip=None,confi=0.9,regionS=None,Mode=0):
 
     if Position:
         print(f"{name} 找到了:{Position}")
+
+
+        Num=0
+
+        NotSave=["探險","下一步","檢測","正在"]
+        SaveF=1
+        for List in NotSave:
+            CheckSave=List in name
+            if CheckSave==True:
+                print(f"檢查:{List} 包含在:{name} Check:{CheckSave}")
+                SaveF=0
+
+        while SaveF:
+            
+            SaveName=os.path.basename(img_path)
+            SaveName=str(SaveName).replace('.png','')
+            SaveFile=os.path.join(ProjectPath,"Get",f"{SaveName}-{Num}.png")
+            
+
+            if os.path.exists(SaveFile):
+                print(f"[{SaveName}]\n{name} 檔案存在")
+                Num+=1
+            else:
+                
+                FindList=os.listdir(os.path.join(ProjectPath,"Get"))
+                
+                CheckNum=0
+                
+                for i in range(5):
+                    for i in FindList:
+                        if i.endswith(".png"):
+                            CheFile=os.path.join(ProjectPath,"Get",i)
+                            
+                            with Image.open(CheFile) as img:
+                                CheckFi=pyautogui.locateOnScreen(img,confidence=0.7)
+                                if CheckFi:
+                                    CheckNum=1
+                                    print(f"檢查符合:{CheckFi} {os.path.basename(CheFile)}")
+                            if CheckNum==1:
+                                break 
+                                    
+
+                if not CheckNum==1:
+                    print(f"沒有符合的!")
+                    pyautogui.screenshot().save(SaveFile)
+                    print(f"存下截圖:{SaveFile}")
+                    
+                else:
+                    print(f"{CheckSave}:不存儲:{name}->{List}")
+                    print(f"含有已符合")
+
         return Position
     elif tip==1:
         print(f"{name} 沒有")
@@ -421,7 +472,7 @@ def press(key):
         elif key == keyboard.KeyCode.from_char("p"):
             print("測試click Mode 1")
             xy=pyautogui.position()
-            click(xy,Mode=1)
+            click(xy,Mode=SelectMode)
     
 
 
@@ -494,30 +545,46 @@ else:
 ListenResume=[10,10]
 
 
+SelectMode=0
+
 
 
 while True:
+    if Delay<1:
+        Delay=0.3
+        print(f"延遲不能小於{Delay}秒!!")
+
+
+    Size=pyautogui.size()
     Position=pyautogui.position()
     DictText={
+        "Size":Size,
         "Position":Position,
         "Delay":Delay,
         "AutoMode":AutoMode,
         "MListen":Mouselisten.is_alive(),
         "KListen":Keylisten.is_alive(),
-        "Time":WinTool.NowTime()
+        "Time":WinTool.NowTime(),
+        "SetMode":SelectMode
     }
     DisplayText=[
         "當前位置:{Position} 延遲:{Delay} 狀態:{AutoMode[0]}",
         "自動下一步{AutoMode[3]} 接替於:{AutoMode[1][0]}",
         "M:{MListen} Key:{KListen}",
-        "-- {Time}"
+        "[是否使用百分比調整:{SetMode}]",
+        "-- {Time}",
+        "- {Size}"
     ]
     DisplayText.insert(0,"="*len(DisplayText[0]))
     DisplayText.append("="*len(DisplayText[0]))
     print("\n".join(DisplayText).format_map(DictText))
-    #LDOperationRecorderWindow 操作錄製窗口
-    #LDPlayerMainFrame 主窗口    
+
     
+    if Size.width<1920:
+        SelectMode=1
+    else:
+        SelectMode=0
+
     if Debug==1:
         print(f"只測試鍵盤滑鼠")
         time.sleep(Delay)
@@ -535,9 +602,9 @@ while True:
         elif not Mouselisten.is_alive():    
             if Debug==3:
                 print(f"調試模式:{Debug} 不啟用滑鼠")
-                continue
-            Mouselisten=mouse.Listener(on_move=move, on_click=mclick)
-            Mouselisten.start()
+            else:   
+                Mouselisten=mouse.Listener(on_move=move, on_click=mclick)
+                Mouselisten.start()
 
 
     if AutoMode[1][0]<=0:
@@ -630,9 +697,9 @@ while True:
             AutoC+=Delay #動態出貓間隔
 
 
-    elif AutoMode[0]==1:
+    if AutoMode[0]==1:
         
-        Work1=get_xy("Work.png","加碼多多 正在探險",Mode=1)
+        Work1=get_xy("Work.png","加碼多多 正在探險",Mode=SelectMode)
         if Work1 == None: #非探險
             ActiveWin=WinTool.CheckActiveWindow()
             if ActiveWin:
@@ -640,56 +707,68 @@ while True:
                 if CheckWin:
                     if CheckWin[3] == ActiveWin.get("Handle"):
                         print(f"前台窗口匹配:{CheckWin[1]}")
-                        if Delay>20:Delay-=20
-            if Delay>3:Delay-=3
+                        if Delay>40:Delay-=20
+            if Delay>10:Delay-=3
 
-            SelectS=get_xy("SelectS.png","選項界面",Mode=1)
+            SelectS=get_xy("SelectS.png","選項界面",Mode=SelectMode)
             if SelectS==None:
-                Cancel=get_xy("Cancel.png","關閉頁面",Mode=1)
+                Cancel=get_xy("Cancel.png","關閉頁面",Mode=SelectMode)
                 if Cancel:
                     click(Cancel)
-            else:
-                Base=get_xy("Base.png","正在基地",Mode=1)
+
+                print("檢查其他!")
+                Base=get_xy("Base.png","正在基地",Mode=SelectMode)
                 if Base:
-                    Addd=get_xy("Add4.png","去加碼多多",Mode=1)
+                    Addd=get_xy("Add4.png","去加碼多多",Mode=SelectMode)
                     if Addd:
                         click(Addd)
-            
-                CNext=get_xy("Select\\NextCheck.png","可下一步",Mode=1)
-                if CNext:
-                    Card=get_xy("item\\Card.png","獲得貓咪卷")
-                    if Card:
-                        time.sleep(1)
-                        OK=get_xy("OK3.png","確認-1")
-                        if OK:click(OK)
-                    OK2=get_xy("OK3.png","確認-2")
-                    if OK2:
-                        OK2State=pyautogui.pixelMatchesColor(int(OK2.x),int(OK2.y),(254, 254, 254))
-                        if OK2State:
-                            click(OK2)
-                        else:
-                            OKColor=get_xy("item\\OKColor.png","確認顏色")
-                            if OKColor:
-                                ClickOK=pyautogui.pixelMatchesColor(int(OKColor.x),int(OKColor.y),(255, 193, 0))
-                                click(OKColor)
-                    
-                    LevelUP=get_xy("Select\\LevelUP.png","加碼多多等級提升",Mode=1)
-                    if LevelUP:click(LevelUP,Mode=1)
-                    
-                    if AutoMode[3][0]>0:AutoMode[3][0]-=1
-                    elif AutoMode[3][0]<=0:
-                        click(CNext,Mode=1)
-                        print("自動下一步")
-                        AutoMode[3][0]=AutoMode[3][1]
-                        time.sleep(3)
-                    
                 
+                CNextLRDict=[
+                    "Select\\WinLeft.png",
+                    "Select\\WinRight.png"
+                ]
+                            
+                for i in CNextLRDict:
+                    print(f"檢查窗口:{i}")
+
+                    CNext=get_xy(i,"有窗口 可下一步",Mode=SelectMode)
+                    if CNext:
+                        print(f"{os.path.basename(i)} 符合的此圖片")
+
+                        Card=get_xy("item\\Card.png","獲得貓咪卷")
+                        if Card:
+                            time.sleep(1)
+                            OK=get_xy("OK3.png","確認-1")
+                            if OK:click(OK)
+                        OK2=get_xy("OK3.png","確認-2")
+                        if OK2:
+                            OK2State=pyautogui.pixelMatchesColor(int(OK2.x),int(OK2.y),(254, 254, 254))
+                            if OK2State:
+                                click(OK2)
+                            else:
+                                OKColor=get_xy("item\\OKColor.png","確認顏色")
+                                if OKColor:
+                                    ClickOK=pyautogui.pixelMatchesColor(int(OKColor.x),int(OKColor.y),(255, 193, 0))
+                                    click(OKColor)
+                        
+                        LevelUP=get_xy("Select\\LevelUP.png","加碼多多等級提升",Mode=SelectMode)
+                        if LevelUP:click(LevelUP,Mode=SelectMode)
+                        
+                        if AutoMode[3][0]>0:AutoMode[3][0]-=Delay
+                        elif AutoMode[3][0]<=0:
+                            click(CNext,Mode=SelectMode)
+                            print("自動下一步")
+                            AutoMode[3][0]=AutoMode[3][1]
+                            time.sleep(3)
+
+                    
+            MapsS=0 #第幾組Map    
             AutoState=MoreSearch(listT=MSearchAddState,Name="加碼多多 尚未探險",Mode_=1)
             if AutoState:
                 click(AutoState)
                 time.sleep(3)
+            
                 
-                MapsS=0 #第幾組Map
                 if ItemGet.Play>1:
                     XPRange=ItemGet.Range().get('XP')
                     print(f"Check:{XPRange}")
@@ -697,122 +776,100 @@ while True:
                         MapsS=1
                     elif XPRange>=70:
                         MapsS=2
-                else:
-                    SetHour=HourGet(Maps=MapsS,Debug=1)[0]
-                    Text=[
-                        f"探險次數:{ItemGet.Play} < 1",
-                        f"使用預設 第:{MapsS}組 策略"
-                    ]
-                    
-                    print("\n".join(Text))
-                    
+            else:
+                SetHour=HourGet(Maps=MapsS)[0]
+                Text=[
+                    f"探險次數:{ItemGet.Play} < 1",
+                    f"使用預設 第:{MapsS}組 策略"
+                ]
                 
+                print("\n".join(Text))
                 
+            
+            AutoA1=get_xy(f"Select\\{SetHour}HS.png",f"加碼多多{SetHour}H",Mode=SelectMode) 
+            if AutoA1:
                 HourPlan.append(SetHour) #紀錄使用策略
-
                 HourCount+=SetHour
                 ItemGet.Hour+=SetHour
-                AutoA1=get_xy(f"Select\\{SetHour}HS.png",f"加碼多多{SetHour}H",Mode=1) 
-                if AutoA1:
-                    time.sleep(3)
-                    click(AutoA1,Mode=1)
-                    time.sleep(3)
-                    OK=get_xy("Select\\Yes.png","確定",Mode=1)
-                    if OK:
-                        click(OK,Mode=1)
-                        ItemGet.Play+=1
+                
+                click(AutoA1,Mode=SelectMode)
+                time.sleep(3)
+                OK=get_xy("Select\\Yes.png","確定",Mode=SelectMode)
+                if OK:
+                    click(OK,Mode=SelectMode)
+                    ItemGet.Play+=1
 
-                    time.sleep(3) #等待3秒
+                time.sleep(3) #等待3秒
 
                     
 
-            Gold=get_xy("Gold.png","驗收",Mode=1)
+            Gold=get_xy("Gold.png","驗收",Mode=SelectMode)
             if Gold:
-                click(Gold,Mode=1)
+                click(Gold,Mode=SelectMode)
             else:
-                Next=get_xy("Select\\Next.png","下一步",Mode=1)
-                if Next:
-                    if Delay>1:Delay-=1
+                if Delay>15:Delay-=10
 
-                    for i in range(10): #檢查10次
-                        GetM=get_xy("Get3.png","得到物品",Mode=1)
-                        if GetM:
-                            RG=(GetM.x-700,GetM.y-400,GetM.x+500,GetM.y+100)
-                            
-                            CheckFile=None #檢測是否相似用
-                            FileRoot=f"{ProjectPath}\\Get\{CaptureF}.png"
-                            
-                            while os.path.exists(FileRoot): #已存在檔案檢測
-                                print(f'{FileRoot}:存在')
-                                
-                                CheckFile=get_xy(FileRoot,'檢測是否此檔案相似')
-                                CaptureF+=1
-                                FileRoot=f"{ProjectPath}\\Get\{CaptureF}.png"
-                            
-                            if CheckFile is None:
-                                pyautogui.screenshot(region=RG).save(FileRoot)
+                for i in range(5): #檢查10次
+                    time.sleep(1)
+                    GetM=get_xy("Get3.png","得到物品",Mode=SelectMode)
+                    if GetM:
+
+                        if AutoMode[3][0]<=0:
+                            click(CNext,Mode=SelectMode)
+                            print("自動下一步 得到物品")
+                            AutoMode[3][0]=AutoMode[3][1]
+                        
+                        Feed=get_xy('item/Feed.png',"獲得罐頭",Mode=SelectMode)
+                        if Feed:
+                            Feed1=get_xy('item/Feed/2.png',"獲得罐頭x2",Mode=SelectMode)
+                            if Feed1:ItemGet.AddFeed(2)
+                            else:   
+                                ItemGet.AddFeed(1)
+                            click(GetM,Mode=SelectMode)
+                        
+                        xp=get_xy('item/xp.png',"獲得xp",Mode=SelectMode)
+                        if xp:
+                            xp800=get_xy('item/xp/800.png',"獲得xp+800",Mode=SelectMode)
+                            if xp800:
+                                ItemGet.AddXP(800)
                             else:
-                                print("截圖相符! 已略過新存儲")
-
-                            SWW=WinTool.FindW(Window=SearchWin)
-                            if SWW:
-                                print("已找到窗口")
-                                WinRect=SWW[2]
-                                with open(f"{ProjectPath}\\Get\\Screen.txt", "a") as f:
-                                    f.write(f"[{WinTool.NowTime()}]\n窗口區域:{CaptureF}:{WinRect}\n")
+                                ItemGet.AddXP(100)
+                            click(GetM,Mode=SelectMode)
+                        else:
+                            xp5k=get_xy('item/xp/5000.png',"獲得xp 5000",Mode=SelectMode)    
+                            if xp5k:
+                                ItemGet.AddXP(5000,Type_D='5KCount')
+                                click(GetM,Mode=SelectMode)
                             else:
-                                print(f"沒找到窗口{SWW}")
-                                
-
-                            Feed=get_xy('item/Feed.png',"獲得罐頭",Mode=1)
-                            if Feed:
-                                Feed1=get_xy('item/Feed/2.png',"獲得罐頭x2",Mode=1)
-                                if Feed1:ItemGet.AddFeed(2)
-                                else:   
-                                    ItemGet.AddFeed(1)
-                                click(GetM,Mode=1)
-                            
-                            xp=get_xy('item/xp.png',"獲得xp",Mode=1)
-                            if xp:
-                                xp800=get_xy('item/xp/800.png',"獲得xp+800",Mode=1)
-                                if xp800:
-                                    ItemGet.AddXP(800)
+                                xp1w=get_xy('item/xp/10000.png',"獲得xp 10000",Mode=SelectMode)    
+                                if xp1w:
+                                    ItemGet.AddXP(10000)
+                                    click(GetM,Mode=SelectMode)
                                 else:
-                                    ItemGet.AddXP(100)
-                                click(GetM,Mode=1)
-                            else:
-                                xp5k=get_xy('item/xp/5000.png',"獲得xp 5000",Mode=1)    
-                                if xp5k:
-                                    ItemGet.AddXP(5000,Type_D='5KCount')
-                                    click(GetM,Mode=1)
-                                else:
-                                    xp1w=get_xy('item/xp/10000.png',"獲得xp 10000",Mode=1)    
-                                    if xp1w:
-                                        ItemGet.AddXP(10000)
-                                        click(GetM,Mode=1)
-                                    else:
-                                        xp3w=get_xy('item/xp/30000.png',"獲得xp 30000",Mode=1)    
-                                        if xp3w:
-                                            ItemGet.AddXP(30000,Type_D='3WCount')    
-                                        xp5w=get_xy('item/xp/50000.png',"獲得xp 50000",Mode=1)    
-                                        if xp5w:
-                                            ItemGet.AddXP(50000,Type_D='5WCount')
+                                    xp3w=get_xy('item/xp/30000.png',"獲得xp 30000",Mode=SelectMode)    
+                                    if xp3w:
+                                        ItemGet.AddXP(30000,Type_D='3WCount')    
+                                    xp5w=get_xy('item/xp/50000.png',"獲得xp 50000",Mode=SelectMode)    
+                                    if xp5w:
+                                        ItemGet.AddXP(50000,Type_D='5WCount')
+                        
 
-                        Back=get_xy("Back.png","回來了",Mode=1)
-                        if Back:
-                            click(Back,Mode=1)
-                            break
-
-                        click(Next,10,Mode=1)
+                    Back=get_xy("Back.png","回來了",Mode=SelectMode)
+                    if Back:
+                        click(Back,Mode=SelectMode)
+                        
+                    Next=get_xy("Select\\Next.png","下一步",Mode=SelectMode)
+                    if Next:
+                        click(Next,10,Mode=SelectMode)
 
                 
-            End=get_xy("End.png","探險結果",Mode=1)
+            End=get_xy("End.png","探險結果",Mode=SelectMode)
             if End:
-                click(End,Mode=1)
+                click(End,Mode=SelectMode)
 
             if HourCount>=6:
                 HourCount=0
-                BackBaseC=get_xy("Back2.png","每6小時 返回驗收確認",Mode=1)
+                BackBaseC=get_xy("Back2.png","每6小時 返回驗收確認",Mode=SelectMode)
                 if BackBaseC:click(BackBaseC)
             
         else:
