@@ -4,6 +4,8 @@
 import time,math
 import threading
 import win32gui
+import win32ui,win32con,numpy
+
 
 class WinTool:
     """
@@ -44,7 +46,7 @@ class WinTool:
             T1.start()
             T1.join()
 
-    def FindW(Class=None,Window=None):
+    def FindW(Window=None,Class=None):
         """
         用於指定窗口定位
 
@@ -118,6 +120,8 @@ class WinTool:
             窗口標題 Text 標題長度 Len
 
             纇名 Class 窗口大小 Rect(x1,y1,x2,y2)
+
+            枸柄Handle
         """
         ActWindow=win32gui.GetForegroundWindow() #取當前正在使用的窗口
         
@@ -136,9 +140,101 @@ class WinTool:
         }
         return Result
 
+    def WinDC(handle):
+        """
+        取得特定窗口的畫面
 
+        handle - 要獲取的窗口枸柄
 
+        Return - Dict 字典
+        
+        | Dict 鍵值 | 說明 |
+        | --- | --- |
+        | RGB | 3通道圖像 |
+        | BGRA | 原始4通道圖像 |
+        | BITMAP | BitMap數據 |
 
+        """
+
+        x1,y1,x2,y2=win32gui.GetWindowRect(handle)
+        width,height=x2-x1,y2-y1
+
+        hwin=win32gui.GetWindowDC(handle)
+
+        srcDC=win32ui.CreateDCFromHandle(hwin)
+        memDC=srcDC.CreateCompatibleDC()
+
+        bmap=win32ui.CreateBitmap()
+
+        bmap.CreateCompatibleBitmap(srcDC,width,height)
+        
+        memDC.SelectObject(bmap)
+        memDC.BitBlt((0,0),(width,height),srcDC,(0,0),win32con.SRCCOPY)
+
+        
+
+        ArrayScr=bmap.GetBitmapBits(True)
+
+        img=numpy.frombuffer(ArrayScr,dtype=numpy.uint8)
+        img.shape=(height,width,4) #原始4通道
+        b,g,r,a=cv2.split(img) #通道分割
+        RGBIMG=cv2.merge((b,g,r),img)
+
+        Result={
+            "RGB":RGBIMG,
+            "BGRA":img,
+            "BITMAP":ArrayScr,
+            "srcDC":srcDC
+        }
+    
+        srcDC.DeleteDC()
+        memDC.DeleteDC()
+        #最大化動畫關閉
+        #win32gui.SystemParametersInfo(win32con.SPI_SETANIMATION,0)
+        win32gui.ReleaseDC(handle,hwin)
+        win32gui.DeleteObject(bmap.GetHandle())
+        
+        return Result
+        
+    def send_bitmap(hwnd, bmp):
+        """
+        將位圖數據傳遞給窗口
+        """
+        import win32ui,win32con,numpy
+
+        # 創建 device context
+        hdc = win32gui.GetDC(hwnd)
+        memdc = win32ui.CreateDCFromHandle(hdc)
+        bmpdc = memdc.CreateCompatibleDC()
+
+        # 創建 bitmap 對象
+        bmpobj = win32ui.CreateBitmap()
+        bmpobj.CreateCompatibleBitmap(memdc, bmp.shape[1], bmp.shape[0])
+
+        # 將圖像數據寫入 bitmap 對象
+        img = numpy.ascontiguousarray(bmp[..., ::-1])
+        bmp_info = {
+            'bmType': 0,
+            'bmWidth': img.shape[1],
+            'bmHeight': img.shape[0],
+            'bmPlanes': 1,
+            'bmBitsPixel': 24,
+            'bmBits': img.tobytes(),
+        }
+        import win32api
+
+        win32api.SetBitmapBits(bmp_info['bmBits'])
+
+        # 將 bitmap 對象寫入 device context
+        bmpdc.SelectObject(bmpobj)
+        win32gui.SendMessage(hwnd, win32con.WM_PAINT, 0, 0)
+
+        # 刪除 device context 和 bitmap 對象
+        memdc.DeleteDC()
+        bmpdc.DeleteDC()
+        win32gui.ReleaseDC(hwnd, hdc)
+        bmpobj.DeleteObject()
+        
     def NowTime(Format=f"%Y/%m/%d %p %H:%M:%S",**Replace):
         """
         Format:f"%Y/%m/%d" 顯示樣式調整
@@ -171,7 +267,16 @@ class WinTool:
         
         return str
     
+from PIL import Image,ImageDraw
+import matplotlib.pyplot as PLT #交互窗口
+import matplotlib
+from matplotlib.animation import FuncAnimation
 
+
+matplotlib.use("TkAgg",force=True)
+class PILTool:
+    def ShowIM(self,img,hwnd):
+        print("test")  
 
 import cv2
 class cv2Tool:
@@ -339,7 +444,20 @@ class GetItem:
         return f"獲得 xp:{self.xp['Count']}次 +{self.xp['Value']} 貓罐頭:{self.feed['Count']}次 +{self.feed['Value']} 已探險{self.Play}次 共{self.Hour}小時"
 
 
-# Item=GetItem()
-# Item.AddXP(300)
-# Item.AddXP(900)
-# print(Item.Result())
+
+# import win32con
+
+# E=win32gui.CreateWindowEx(0,'Static',"Test",win32con.WS_VISIBLE,0,0,640,360,None,None,None,None)
+
+
+# hwnd = win32gui.FindWindow(None, "Window Title")
+# send_bitmap(hwnd, numpy.zeros((100,100)))
+
+# while True:
+#     Wi=WinTool.FindW(Window="雷電模擬器")
+#     if Wi:    
+#         EEE=WinTool.WinDC(Wi[3])
+#         if EEE:
+#             win32gui.SendMessage(E, win32con.STM_SETIMAGE, win32con.IMAGE_BITMAP, EEE[0])
+#             win32gui.SendMessage(E, "Hello",win32con.SEL_TEXT)
+
