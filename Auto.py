@@ -723,13 +723,13 @@ while True:
             AutoA1=get_xy(f"Select\\{SetHour}HS.png",f"加碼多多{SetHour}H",Mode=SelectMode) 
             if AutoA1:
                 click(AutoA1,Mode=SelectMode)
-                OK=get_xy("Select\\Yes.png","確定",Mode=SelectMode)
-                if OK:
-                    click(OK,Mode=SelectMode)
-                    HourPlan.append(SetHour) #紀錄使用策略
-                    HourCount+=SetHour
-                    ItemGet.Hour+=SetHour
-                    ItemGet.Play+=1
+            OK=get_xy("Select\\Yes.png","確定",Mode=SelectMode)
+            if OK:
+                click(OK,Mode=SelectMode)
+                HourPlan.append(SetHour) #紀錄使用策略
+                HourCount+=SetHour
+                ItemGet.Hour+=SetHour
+                ItemGet.Play+=1
 
 
 
