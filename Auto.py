@@ -335,7 +335,7 @@ def get_xy(img_path=None,name="測試",tip=None,confi=0.9,regionS=None,Mode=0):
                 
                 CheckNum=0
                 
-                for iR in range(5):
+                for iR in range(2):
                     for i in FindList:
                         if i.endswith(".png"):
                             CheFile=os.path.join(ProjectPath,"Get",i)
@@ -699,6 +699,40 @@ while True:
 
     if AutoMode[0]==1:
         
+        SelectA=get_xy("Select/Area.png","加碼多多 正在探險區域選擇",Mode=SelectMode)
+        if SelectA:
+            MapsS=0 #第幾組Map
+            
+            if ItemGet.Play>1:
+                XPRange=ItemGet.Range().get('XP')
+                print(f"Check:{XPRange}")
+                if XPRange>=40:
+                    MapsS=1
+                elif XPRange>=70:
+                    MapsS=2
+            SetHour=HourGet(Maps=MapsS)[0]
+            Text=[
+                f"策略使用:"
+                f"探險次數:{ItemGet.Play} < 1",
+                f"使用預設 第:{MapsS}組 策略"
+            ]
+            
+            print("\n".join(Text))
+            
+            
+            AutoA1=get_xy(f"Select\\{SetHour}HS.png",f"加碼多多{SetHour}H",Mode=SelectMode) 
+            if AutoA1:
+                click(AutoA1,Mode=SelectMode)
+                OK=get_xy("Select\\Yes.png","確定",Mode=SelectMode)
+                if OK:
+                    click(OK,Mode=SelectMode)
+                    HourPlan.append(SetHour) #紀錄使用策略
+                    HourCount+=SetHour
+                    ItemGet.Hour+=SetHour
+                    ItemGet.Play+=1
+
+
+
         Work1=get_xy("Work.png","加碼多多 正在探險",Mode=SelectMode)
         if Work1 == None: #非探險
             ActiveWin=WinTool.CheckActiveWindow()
@@ -709,6 +743,7 @@ while True:
                         print(f"前台窗口匹配:{CheckWin[1]}")
                         if Delay>40:Delay-=20
             if Delay>10:Delay-=3
+
 
             SelectS=get_xy("SelectS.png","選項界面",Mode=SelectMode)
             if SelectS==None:
@@ -737,7 +772,6 @@ while True:
 
                         Card=get_xy("item\\Card.png","獲得貓咪卷")
                         if Card:
-                            time.sleep(1)
                             OK=get_xy("OK3.png","確認-1")
                             if OK:click(OK)
                         OK2=get_xy("OK3.png","確認-2")
@@ -762,44 +796,11 @@ while True:
                             time.sleep(3)
 
                     
-            MapsS=0 #第幾組Map    
+
             AutoState=MoreSearch(listT=MSearchAddState,Name="加碼多多 尚未探險",Mode_=1)
             if AutoState:
                 click(AutoState)
-                time.sleep(3)
-            
-                
-                if ItemGet.Play>1:
-                    XPRange=ItemGet.Range().get('XP')
-                    print(f"Check:{XPRange}")
-                    if XPRange>=40:
-                        MapsS=1
-                    elif XPRange>=70:
-                        MapsS=2
-            else:
-                SetHour=HourGet(Maps=MapsS)[0]
-                Text=[
-                    f"探險次數:{ItemGet.Play} < 1",
-                    f"使用預設 第:{MapsS}組 策略"
-                ]
-                
-                print("\n".join(Text))
-                
-            
-            AutoA1=get_xy(f"Select\\{SetHour}HS.png",f"加碼多多{SetHour}H",Mode=SelectMode) 
-            if AutoA1:
-                HourPlan.append(SetHour) #紀錄使用策略
-                HourCount+=SetHour
-                ItemGet.Hour+=SetHour
-                
-                click(AutoA1,Mode=SelectMode)
-                time.sleep(3)
-                OK=get_xy("Select\\Yes.png","確定",Mode=SelectMode)
-                if OK:
-                    click(OK,Mode=SelectMode)
-                    ItemGet.Play+=1
 
-                time.sleep(3) #等待3秒
 
                     
 
