@@ -355,8 +355,8 @@ def get_xy(img_path=None,name="測試",tip=None,confi=0.9,regionS=None,Mode=0):
                     print(f"存下截圖:{SaveFile}")
                     
                 else:
-                    print(f"{CheckSave}:不存儲:{name}->{List}")
-                    print(f"含有已符合")
+                    print(f"已有截圖含有已符合")
+                    break #跳出本迴圈
 
         return Position
     elif tip==1:
