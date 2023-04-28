@@ -699,7 +699,7 @@ while True:
 
     if AutoMode[0]==1:
         
-        SelectA=get_xy("Select/Area.png","加碼多多 正在探險區域選擇",Mode=SelectMode)
+        SelectA=get_xy("Select/SArea.png","加碼多多 正在探險區域選擇",Mode=SelectMode)
         if SelectA:
             MapsS=0 #第幾組Map
             
