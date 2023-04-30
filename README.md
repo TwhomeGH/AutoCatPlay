@@ -132,7 +132,7 @@ WebFile="C:/Users/u01/Desktop/NuclearWeb/Status.json"
 用來給Siri捷徑 訪問網站下的指定檔案 獲取文字內容   
 來方便從iPad上查看統計數據
 
->> 現在結果以JSON字典保存
+> 現在結果以JSON字典保存
 
 
 ## 關於KeySet - Auto.py
