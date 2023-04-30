@@ -91,7 +91,7 @@ python Auto.py
 * Shot 這是使用Capture截取下來的圖片存儲位置
 * img 主要查找用圖片存放
 
-* IMGG 測試
+
 
 # 依賴庫Requirements:
 
