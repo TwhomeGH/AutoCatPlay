@@ -898,11 +898,6 @@ while True:
                     GetM=get_xy("Get3.png","得到物品",Mode=SelectMode)
                     if GetM:
 
-                        if AutoMode[3][0]<=0:
-                            click(CNext)
-                            print("自動下一步 得到物品")
-                            AutoMode[3][0]=AutoMode[3][1]
-                        
                         Feed=get_xy('item/Feed.png',"獲得罐頭",Mode=SelectMode)
                         if Feed:
                             Feed1=get_xy('item/Feed/2.png',"獲得罐頭x2",Mode=SelectMode)
