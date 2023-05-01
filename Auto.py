@@ -893,7 +893,7 @@ while True:
                     if GetM:
 
                         if AutoMode[3][0]<=0:
-                            click(CNext,Mode=SelectMode)
+                            click(CNext)
                             print("自動下一步 得到物品")
                             AutoMode[3][0]=AutoMode[3][1]
                         
@@ -903,7 +903,7 @@ while True:
                             if Feed1:ItemGet.AddFeed(2)
                             else:   
                                 ItemGet.AddFeed(1)
-                            click(GetM,Mode=SelectMode)
+                            click(GetM)
                         
                         xp=get_xy('item/xp.png',"獲得xp",Mode=SelectMode)
                         if xp:
@@ -912,17 +912,17 @@ while True:
                                 ItemGet.AddXP(800)
                             else:
                                 ItemGet.AddXP(100)
-                            click(GetM,Mode=SelectMode)
+                            click(GetM)
                         else:
                             xp5k=get_xy('item/xp/5000.png',"獲得xp 5000",Mode=SelectMode)    
                             if xp5k:
                                 ItemGet.AddXP(5000,Type_D='5KCount')
-                                click(GetM,Mode=SelectMode)
+                                click(GetM)
                             else:
                                 xp1w=get_xy('item/xp/10000.png',"獲得xp 10000",Mode=SelectMode)    
                                 if xp1w:
                                     ItemGet.AddXP(10000)
-                                    click(GetM,Mode=SelectMode)
+                                    click(GetM)
                                 else:
                                     xp3w=get_xy('item/xp/30000.png',"獲得xp 30000",Mode=SelectMode)    
                                     if xp3w:
@@ -934,16 +934,16 @@ while True:
 
                     Back=get_xy("Back.png","回來了",Mode=SelectMode)
                     if Back:
-                        click(Back,Mode=SelectMode)
+                        click(Back)
                         
                     Next=get_xy("Select\\Next.png","下一步",Mode=SelectMode)
                     if Next:
-                        click(Next,10,Mode=SelectMode)
+                        click(Next,10)
 
                 
             End=get_xy("End.png","探險結果",Mode=SelectMode)
             if End:
-                click(End,Mode=SelectMode)
+                click(End)
 
             if HourCount>=6:
                 HourCount=0
