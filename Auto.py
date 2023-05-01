@@ -837,7 +837,9 @@ while True:
                 
                 CNextLRDict=[
                     "Select\\WinLeft.png",
+                    "Select\\WinLeft-2.png",
                     "Select\\WinRight.png"
+                    "Select\\WinRight-2.png",
                 ]
                             
                 for i in CNextLRDict:
@@ -886,7 +888,7 @@ while True:
             if Gold:
                 click(Gold,Mode=SelectMode)
             
-            ResultCat=get_xy("Select\\Result-2","可驗收得到物品",Mode=SelectMode)
+            ResultCat=get_xy("Select\\Result-2.png","可驗收得到物品",Mode=SelectMode)
             if ResultCat:
                 
                 for i in range(5): #檢查5次
