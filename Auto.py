@@ -867,9 +867,11 @@ while True:
                         LevelUP=get_xy("Select\\LevelUP.png","加碼多多等級提升",Mode=SelectMode)
                         if LevelUP:click(LevelUP)
                         
-                        if AutoMode[3][0]>0:AutoMode[3][0]-=Delay
-
-                        elif AutoMode[3][0]<=0:
+                        if AutoMode[3][0]>0:
+                            AutoMode[3][0]-=Delay
+                        
+                        print('AutoMode[3][0]',AutoMode[3][0])
+                        if AutoMode[3][0]<=0:
                             click(CNext)
                             print("自動下一步")
                             AutoMode[3][0]=AutoMode[3][1]
@@ -886,10 +888,11 @@ while True:
 
             Gold=get_xy("Gold.png","驗收",Mode=SelectMode)
             if Gold:
-                click(Gold,Mode=SelectMode)
+                click(Gold)
             
             ResultCat=get_xy("Select\\Result-2.png","可驗收得到物品",Mode=SelectMode)
             if ResultCat:
+                click(ResultCat)
                 
                 for i in range(5): #檢查5次
                     GetM=get_xy("Get3.png","得到物品",Mode=SelectMode)
