@@ -5,6 +5,7 @@ import time #等待用
 import os #用來取當前文件位置
 import cv2 #百分比調整
 import random #隨機數
+import json
 
 from CatFeed import *
 
@@ -773,7 +774,7 @@ while True:
     
 
 
-    elif AutoMode[0]==1:
+    if AutoMode[0]==1:
         
         SelectA=get_xy("Select/SArea.png","加碼多多 正在探險區域選擇",Mode=SelectMode,tip=1)
         if SelectA:
@@ -884,11 +885,11 @@ while True:
             Gold=get_xy("Gold.png","驗收",Mode=SelectMode)
             if Gold:
                 click(Gold,Mode=SelectMode)
-            else:
-                if Delay>15:Delay-=10
-
-                for i in range(5): #檢查10次
-                    time.sleep(1)
+            
+            ResultCat=get_xy("Select\\Result-2","可驗收得到物品",Mode=SelectMode)
+            if ResultCat:
+                
+                for i in range(5): #檢查5次
                     GetM=get_xy("Get3.png","得到物品",Mode=SelectMode)
                     if GetM:
 
@@ -930,20 +931,23 @@ while True:
                                     xp5w=get_xy('item/xp/50000.png',"獲得xp 50000",Mode=SelectMode)    
                                     if xp5w:
                                         ItemGet.AddXP(50000,Type_D='5WCount')
-                        
 
-                    Back=get_xy("Back.png","回來了",Mode=SelectMode)
-                    if Back:
-                        click(Back)
+                                    Next=get_xy("Select\\Next.png","下一步",Mode=SelectMode)
+                                    if Next:
+                                        click(Next,30)
+
+            Back=get_xy("Back.png","回來了",Mode=SelectMode)
+            if Back:
+                click(Back)
                         
-                    Next=get_xy("Select\\Next.png","下一步",Mode=SelectMode)
-                    if Next:
-                        click(Next,10)
+            
 
                 
             End=get_xy("End.png","探險結果",Mode=SelectMode)
             if End:
                 click(End)
+            else:
+                End=get_xy("Select\\Result.png","探險回來了",Mode=SelectMode)
 
             if HourCount>=6:
                 HourCount=0
@@ -971,7 +975,6 @@ while True:
                     AP+=1
                 
                 
-                import json
 
                 DictR=ItemGet.Range()
                 Range='探險數據不夠統計..'
