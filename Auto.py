@@ -68,7 +68,7 @@ KeySet={
 按鍵快捷設定
 """
 
-AutoMode=[0,[15,15],0,[10,10],0] 
+AutoMode=[0,[10,10],0,[5,5],0] 
 """ 用於狀態確定/計數
 
 [0]自動加碼多多狀態
@@ -326,7 +326,7 @@ def get_xy(img_path=None,name="測試",tip=None,confi=0.9,regionS=None,Mode=0,Ne
             print(f"{name} 找到了:{Position}")
 
             if NeedSave == 1: #第一版本存檔模式
-                print("儲存模式-2!")
+                print("儲存模式-1!")
                 Num=0
 
                 NotSave=["探險","下一步","檢測","正在","貓咪砲"]
@@ -378,7 +378,8 @@ def get_xy(img_path=None,name="測試",tip=None,confi=0.9,regionS=None,Mode=0,Ne
                             print(f"已有截圖含有已符合")
                             break #跳出本迴圈
                 return Position
-            elif NeedSave == 2:
+            elif NeedSave >= 2:
+
                 print("[儲存模式-2]")
                 
 
@@ -861,11 +862,12 @@ while True:
                                     click(OKColor)
                         
                         LevelUP=get_xy("Select\\LevelUP.png","加碼多多等級提升",Mode=SelectMode)
-                        if LevelUP:click(LevelUP,Mode=SelectMode)
+                        if LevelUP:click(LevelUP)
                         
                         if AutoMode[3][0]>0:AutoMode[3][0]-=Delay
+
                         elif AutoMode[3][0]<=0:
-                            click(CNext,Mode=SelectMode)
+                            click(CNext)
                             print("自動下一步")
                             AutoMode[3][0]=AutoMode[3][1]
                             time.sleep(3)
