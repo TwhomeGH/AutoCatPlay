@@ -838,7 +838,7 @@ while True:
                 CNextLRDict=[
                     "Select\\WinLeft.png",
                     "Select\\WinLeft-2.png",
-                    "Select\\WinRight.png"
+                    "Select\\WinRight.png",
                     "Select\\WinRight-2.png",
                 ]
                             
