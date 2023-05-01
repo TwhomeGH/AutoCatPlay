@@ -108,7 +108,8 @@ KeyCount={
 """
 
 Region=None #查找位置
-CaptureF=0 #第幾張圖
+CaptureNum=0 #第幾張圖
+MaxCaptureNum=1000 #最大存儲1000張圖
 
 HourCount=0
 
@@ -118,6 +119,7 @@ MSearchAddState=[
     '1.png', '2.png', '3.png', '4.png', '5.png', 
     '6.png', '7.png', '8.png', '9.png', '10.png',
     ]
+
 
 os.system("title Auto加碼多多")
 
@@ -276,14 +278,29 @@ def click(xy,x1r=0,num=1,CDelay=0,Mode=0):
         time.sleep(CDelay)
 
 
-def get_xy(img_path=None,name="測試",tip=None,confi=0.9,regionS=None,Mode=0):
+def get_xy(img_path=None,name="測試",tip=None,confi=0.9,regionS=None,Mode=0,NeedSave=2):
     """
-    img_path 檢測圖片位置\n
-    name 顯示名稱\n
-    tip 提示沒有找到 1開啟 預設關閉\n
-    confi 相似度\n
+    img_path 檢測圖片位置
+
+    name 顯示名稱
+
+    tip 提示沒有找到 1開啟 預設關閉
+
+    confi 相似度
+
     regionS 擷取範圍
-    Mode 1使用新Resize百分比調整
+
+    
+    | Mode 可用值 | 模式說明 |
+    | - | - |
+    | 0 | 不使用重新百分比調整 (預設值) |
+    | 1 | 使用新重新百分比調整 |
+
+    | NeedSave 可用值 | 截圖模式說明 |
+    | - | - |
+    | 0 | 不存儲截圖 |
+    | 1 | 只存已有截圖裡比對不存在的 |
+    | 2 | 圖片上找到就截圖 (預設值)|
     """
     if img_path is None:return '沒有指定圖片'
 
@@ -306,63 +323,106 @@ def get_xy(img_path=None,name="測試",tip=None,confi=0.9,regionS=None,Mode=0):
         return None
 
     if Position:
-        print(f"{name} 找到了:{Position}")
+            print(f"{name} 找到了:{Position}")
 
+            if NeedSave == 1: #第一版本存檔模式
+                print("儲存模式-2!")
+                Num=0
 
-        Num=0
+                NotSave=["探險","下一步","檢測","正在","貓咪砲"]
+                SaveF=1
+                for List in NotSave:
+                    CheckSave=List in name
+                    if CheckSave==True:
+                        print(f"檢查:{List} 包含在:{name} Check:{CheckSave}")
+                        SaveF=0
 
-        NotSave=["探險","下一步","檢測","正在"]
-        SaveF=1
-        for List in NotSave:
-            CheckSave=List in name
-            if CheckSave==True:
-                print(f"檢查:{List} 包含在:{name} Check:{CheckSave}")
-                SaveF=0
-
-        while SaveF:
-            
-            SaveName=os.path.basename(img_path)
-            SaveName=str(SaveName).replace('.png','')
-            SaveFile=os.path.join(ProjectPath,"Get",f"{SaveName}-{Num}.png")
-            
-
-            if os.path.exists(SaveFile):
-                print(f"[{SaveName}]\n{name} 檔案存在")
-                Num+=1
-            else:
-                
-                FindList=os.listdir(os.path.join(ProjectPath,"Get"))
-                
-                CheckNum=0
-                
-                for iR in range(2):
-                    for i in FindList:
-                        if i.endswith(".png"):
-                            CheFile=os.path.join(ProjectPath,"Get",i)
-                            
-                            with Image.open(CheFile) as img:
-                                CheckFi=pyautogui.locateOnScreen(img,confidence=0.7)
-                                if CheckFi:
-                                    CheckNum=1
-                                    print(f"檢查符合:{CheckFi} {os.path.basename(CheFile)}")
-                            if CheckNum==1:
-                                break 
-                                    
-
-                if not CheckNum==1:
-                    print(f"沒有符合的!")
-                    pyautogui.screenshot().save(SaveFile)
-                    print(f"存下截圖:{SaveFile}")
+                while SaveF:
                     
-                else:
-                    print(f"已有截圖含有已符合")
-                    break #跳出本迴圈
+                    SaveName=str(os.path.basename(img_path)).replace('.png','')
+                    
 
-        return Position
+                    SaveFile=os.path.join(ProjectPath,"Get",f"{SaveName}-{Num}.png")
+                    print("SaveName:",SaveName,"SaveFile:",SaveFile,"Num:",Num)
+
+                    if os.path.exists(SaveFile):
+                        print(f"[{SaveName}]\n{SaveFile} 檔案存在")
+                        Num+=1
+                        SaveFile=os.path.join(ProjectPath,"Get",f"{SaveName}-{Num}.png")
+                    else:
+                        
+                        FindList=os.listdir(os.path.join(ProjectPath,"Get"))
+                        
+                        CheckNum=0
+                        
+
+                        for i in FindList:
+                            if i.endswith(".png"):
+                                CheFile=os.path.join(ProjectPath,"Get",i)
+                                
+                                with Image.open(CheFile) as img:
+                                    CheckFi=pyautogui.locateOnScreen(img,confidence=0.7)
+                                    if CheckFi:
+                                        CheckNum=1
+                                        print(f"檢查符合:{CheckFi} {os.path.basename(CheFile)}")
+                                if CheckNum==1:
+                                    break 
+                                        
+
+                        if not CheckNum==1:
+                            print(f"沒有符合的!")
+                            pyautogui.screenshot().save(SaveFile)
+                            print(f"存下截圖:{SaveFile}")
+                            
+                        else:
+                            print(f"已有截圖含有已符合")
+                            break #跳出本迴圈
+                return Position
+            elif NeedSave == 2:
+                print("[儲存模式-2]")
+                
+
+                GetFoloder=os.path.join(ProjectPath,"Get")
+                GetFoloders=sorted(os.listdir(GetFoloder))
+
+                global CaptureNum,MaxCaptureNum 
+
+                if len(GetFoloders)>= MaxCaptureNum:
+                    print(f"已達最大{MaxCaptureNum}的存儲張數\n當前{len(GetFoloders)}不進行存儲")
+                else:
+                    print(f"當前總張數:{len(GetFoloders)}\n最大存儲張數:{MaxCaptureNum}的存儲張數")
+                    for ExistsFile in GetFoloders:
+                        if ExistsFile.endswith('.png'):
+                            print("FoloderNum",GetFoloders.index(ExistsFile))
+
+                            SaveName=str(os.path.basename(img_path)).replace('.png','')
+                            SaveFile=os.path.join(GetFoloder,f"{SaveName}_{CaptureNum}.png")
+                            
+                            if os.path.exists(SaveFile):
+
+                                SaveName=str(os.path.basename(img_path)).replace('.png','')
+                                CaptureNum+=1
+                                SaveFile=os.path.join(GetFoloder,f"{SaveName}_{CaptureNum}.png")
+                                print(f"{SaveName}_{CaptureNum}.png 這個檔案名存在⚠️")
+                            else:
+                                print(f"{SaveName}_{CaptureNum}.png 這個檔案名不存在✅")
+                                break
+                            
+                            
+                    
+                    print(SaveName,"存儲到:",SaveFile,"\n當前計數:",CaptureNum,f"當前已存截圖數量:{len(GetFoloders)} 最大截圖張數",MaxCaptureNum)
+                    pyautogui.screenshot().save(SaveFile)
+
+                return Position
+            else:
+                print("不存儲任何圖片",name,Position)
+                return Position
+                
     elif tip==1:
         print(f"{name} 沒有")
+        return None
 
-def MoreSearch(dir="Add",listT=list(["1.png","2.png"]),Name="Test",Mode_=0,MDelay=1):
+def MoreSearch(dir="Add",listT=list(["1.png","2.png"]),Name="Test",Mode_=0,MDelay=0.1):
     """
     dir 設置所處資料夾
     listT ['1.png','2.png'] 多張查找列表
@@ -416,10 +476,10 @@ def press(key):
         if key == KeySet.get('Auto'):
             if AutoMode[2]==0:
                 AutoMode[2]=1
-                print("啟用自動戰鬥簡易操作")
+                print("啟用自動戰鬥簡易操作", AutoMode[2])
             else:
                 AutoMode[2]=0
-                print("關閉自動戰鬥")
+                print("關閉自動戰鬥" ,AutoMode[2])
         elif key == KeySet.get('Point'):
             print(pyautogui.position())    
     
@@ -550,8 +610,8 @@ SelectMode=0
 
 
 while True:
-    if Delay<1:
-        Delay=0.3
+    if Delay<0.3:
+        Delay=0.1
         print(f"延遲不能小於{Delay}秒!!")
 
 
@@ -579,11 +639,13 @@ while True:
     DisplayText.append("="*len(DisplayText[0]))
     print("\n".join(DisplayText).format_map(DictText))
 
-    
+    print(f"SizeWin",Size.width)
     if Size.width<1920:
         SelectMode=1
     else:
         SelectMode=0
+
+
 
     if Debug==1:
         print(f"只測試鍵盤滑鼠")
@@ -616,6 +678,11 @@ while True:
     
     HasRun=get_xy('HasRun.png',"正在遊戲中")    
     if HasRun and AutoMode[2]==1:
+        
+        if Delay>1:
+            Delay=0.1   
+        print('自動操作!!',Delay)
+
         Shot=get_xy("Play\\Shot3.png","貓咪炮")
         
         if Shot:
@@ -629,22 +696,28 @@ while True:
                 cv2Tool.ShowImage(f'{ProjectPath}\\Test\RCat.png','測試範圍')
 
 
-        if Region!=None:
-            # Squirrel=get_xy('Play\\AT\\BSquirrel.png',"黑松鼠")
-            BlackCat=get_xy('Play\\AT\\BlackCat.png',"黑熊")
+        
+        # Squirrel=get_xy('Play\\AT\\BSquirrel.png',"黑松鼠")
+        BlackCat=get_xy('Play\\AT\\BlackCat.png',"黑熊")
 
-            if BlackCat:
-                if Shot:keyboard.Events.Press('2')
+        if BlackCat:
+            if Shot:keyboard.Events.Press('2')
 
-            #'Cat':[get_xy('Play\\Wall.png',"基本牆"),None,75]
-            # [0] 查找對象 [1] 可出擊顏色 [2] 價錢
+        #'Cat':[get_xy('Play\\Wall.png',"基本牆"),None,75]
+        # [0] 查找對象 [1] 可出擊顏色 [2] 價錢
+
+
+        if AutoC>1 and AutoC <3:
+
             Cannon_Fodder={
                 'Cat':[get_xy('Play\\Cat.png',"小貓",regionS=Region),(151, 151, 148),75],
                 'BigCat':[get_xy('Play\\BigCat.png',"大狂小貓",regionS=Region),(153, 154, 156),75]
             }
             for i in Cannon_Fodder:
                 Cannon=Cannon_Fodder[i]
+                time.sleep(0.2)
                 if Cannon[0]:
+                    
                     CatX,CatY=int(Cannon[0].x),int(Cannon[0].y)
                     print(f"{i}:{pyautogui.pixel(CatX,CatY)}") #確認顏色
 
@@ -652,54 +725,56 @@ while True:
                     print(f"{i} 可出擊:{MatchColor}")
                     if MatchColor:
                         click(Cannon[0])
-            
-            if AutoC>=1:
-                Wall={
-                    'Wall':[get_xy('Play\\Wall.png',"基本牆",regionS=Region),(255, 255, 255),150],
-                    'BigWall':[get_xy('Play\\BigWall.png',"大狂牆",regionS=Region),(255, 255, 255)],
-                    'JumpCat':[get_xy('Play\\JumpCat.png',"跳跳貓",regionS=Region),(67, 46, 0)]
-                }
-                for i in Wall:
-                    Wall_W=Wall[i]
-                    if Wall_W[0]:
-                        CatX,CatY=int(Wall_W[0].x),int(Wall_W[0].y)
-
-                        print(f"{i}:{pyautogui.pixel(CatX,CatY)}") #確認顏色
-
-                        MatchColor=pyautogui.pixelMatchesColor(CatX,CatY,Wall_W[1])
-                        print(f"{i} 可出擊:{MatchColor}")
-                        if MatchColor:
-                            click(Wall_W[0])            
-            
-            if AutoC>=10:
-                SuperCat={
-                    'RamenCat':[get_xy('Play\\RamenCat.png',"拉麵貓",regionS=Region),(83, 61, 11)],
-                    'BigBird':[get_xy('Play\\BigBird.png',"大狂鳥",regionS=Region),(153, 124, 54)],
-                    'FlyingCat':[get_xy('Play\\FlyingCat.png',"飛腳貓",regionS=Region),(79, 52, 2)],
-                    'Mutt38':[get_xy('Play\\Mutt38.png',"姆特",regionS=Region),(229, 198, 127)]
-                }
-                for i in SuperCat:
-                    SuCat=SuperCat[i]
-
-                    if SuCat[0]:
-                        CatX,CatY=int(SuCat[0].x),int(SuCat[0].y)
-                        
-                        print(f"{i}:{pyautogui.pixel(CatX,CatY)}") #確認顏色
-                        
-                        if SuCat[1]==None:continue #沒有指定顏色先跳過
-                        MatchColor=pyautogui.pixelMatchesColor(CatX,CatY,SuCat[1])
-                        print(f"{i} 可出擊:{MatchColor}")
-                        if MatchColor:
-                            click(SuCat[0])
-                time.sleep(2)
-                AutoC=0
-            print(f'AutoC:{AutoC}')
-            AutoC+=Delay #動態出貓間隔
-
-
-    if AutoMode[0]==1:
         
-        SelectA=get_xy("Select/SArea.png","加碼多多 正在探險區域選擇",Mode=SelectMode)
+        if AutoC <7:
+            Wall={
+                'Wall':[get_xy('Play\\Wall.png',"基本牆",regionS=Region),(176, 161, 126)],
+                'BigWall':[get_xy('Play\\BigWall.png',"大狂牆",regionS=Region),(255, 255, 255)],
+                'JumpCat':[get_xy('Play\\JumpCat.png',"跳跳貓",regionS=Region),(67, 46, 0)]
+            }
+            for i in Wall:
+                Wall_W=Wall[i]
+                time.sleep(0.2)
+                if Wall_W[0]:
+                    CatX,CatY=int(Wall_W[0].x),int(Wall_W[0].y)
+
+                    print(f"{i}:{pyautogui.pixel(CatX,CatY)}") #確認顏色
+
+                    MatchColor=pyautogui.pixelMatchesColor(CatX,CatY,Wall_W[1])
+                    print(f"{i} 可出擊:{MatchColor}")
+                    if MatchColor:
+                        click(Wall_W[0])            
+        
+        else:
+            SuperCat={
+                'RamenCat':[get_xy('Play\\RamenCat.png',"拉麵貓",regionS=Region),(83, 61, 11)],
+                'BigBird':[get_xy('Play\\BigBird.png',"大狂鳥",regionS=Region),(153, 124, 54)],
+                'FlyingCat':[get_xy('Play\\FlyingCat.png',"飛腳貓",regionS=Region),(79, 52, 2)],
+                'Mutt38':[get_xy('Play\\Mutt38.png',"姆特",regionS=Region),(229, 198, 127)]
+            }
+            for i in SuperCat:
+                SuCat=SuperCat[i]
+                time.sleep(0.2)
+                if SuCat[0]:
+                    CatX,CatY=int(SuCat[0].x),int(SuCat[0].y)
+                    
+                    print(f"{i}:{pyautogui.pixel(CatX,CatY)}") #確認顏色
+                    
+                    if SuCat[1]==None:continue #沒有指定顏色先跳過
+                    MatchColor=pyautogui.pixelMatchesColor(CatX,CatY,SuCat[1])
+                    print(f"{i} 可出擊:{MatchColor}")
+                    if MatchColor:
+                        click(SuCat[0])
+
+        if AutoC>=10:AutoC=0
+        AutoC+=1 #動態出貓間隔
+        print(f'AutoC:{AutoC} 檢測')
+    
+
+
+    elif AutoMode[0]==1:
+        
+        SelectA=get_xy("Select/SArea.png","加碼多多 正在探險區域選擇",Mode=SelectMode,tip=1)
         if SelectA:
             MapsS=0 #第幾組Map
             
@@ -732,7 +807,7 @@ while True:
                 ItemGet.Play+=1
 
 
-
+        print("檢查正在探險!")
         Work1=get_xy("Work.png","加碼多多 正在探險",Mode=SelectMode)
         if Work1 == None: #非探險
             ActiveWin=WinTool.CheckActiveWindow()
@@ -797,7 +872,7 @@ while True:
 
                     
 
-            AutoState=MoreSearch(listT=MSearchAddState,Name="加碼多多 尚未探險",Mode_=1)
+            AutoState=MoreSearch(listT=MSearchAddState,Name="加碼多多 尚未探險",Mode_=SelectMode)
             if AutoState:
                 click(AutoState)
 
