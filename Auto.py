@@ -13,7 +13,7 @@ from CatFeed import *
 ProjectPath=os.path.dirname(os.path.abspath(__file__))
 print('Project >>',ProjectPath)
 
-WebFile="C:/Users/u01/Desktop/NuclearWeb/Status.json"
+WebFile="H:/NuclearWeb/Status.json"
 """用於指定任意位置存放統計結果"""
 
 SearchWin="雷電模擬器"
@@ -110,7 +110,7 @@ KeyCount={
 
 Region=None #查找位置
 CaptureNum=0 #第幾張圖
-MaxCaptureNum=1000 #最大存儲1000張圖
+MaxCaptureNum=6000 #最大存儲1000張圖
 
 HourCount=0
 
@@ -840,6 +840,7 @@ while True:
                     "Select\\WinLeft-2.png",
                     "Select\\WinRight.png",
                     "Select\\WinRight-2.png",
+                    "Select\\Next.png"
                 ]
                             
                 for i in CNextLRDict:
@@ -892,49 +893,48 @@ while True:
             
             ResultCat=get_xy("Select\\Result-2.png","可驗收得到物品",Mode=SelectMode)
             if ResultCat:
-                click(ResultCat)
                 
-                for i in range(5): #檢查5次
-                    GetM=get_xy("Get3.png","得到物品",Mode=SelectMode)
-                    if GetM:
+                #for i in range(5): #檢查5次
+                GetM=get_xy("Get3.png","得到物品",Mode=SelectMode)
+                if GetM:
 
-                        Feed=get_xy('item/Feed.png',"獲得罐頭",Mode=SelectMode)
-                        if Feed:
-                            Feed1=get_xy('item/Feed/2.png',"獲得罐頭x2",Mode=SelectMode)
-                            if Feed1:ItemGet.AddFeed(2)
-                            else:   
-                                ItemGet.AddFeed(1)
-                            click(GetM)
-                        
-                        xp=get_xy('item/xp.png',"獲得xp",Mode=SelectMode)
-                        if xp:
-                            xp800=get_xy('item/xp/800.png',"獲得xp+800",Mode=SelectMode)
-                            if xp800:
-                                ItemGet.AddXP(800)
-                            else:
-                                ItemGet.AddXP(100)
+                    Feed=get_xy('item/Feed.png',"獲得罐頭",Mode=SelectMode)
+                    if Feed:
+                        Feed1=get_xy('item/Feed/2.png',"獲得罐頭x2",Mode=SelectMode)
+                        if Feed1:ItemGet.AddFeed(2)
+                        else:   
+                            ItemGet.AddFeed(1)
+                        click(GetM)
+                    
+                    xp=get_xy('item/xp.png',"獲得xp",Mode=SelectMode)
+                    if xp:
+                        xp800=get_xy('item/xp/800.png',"獲得xp+800",Mode=SelectMode)
+                        if xp800:
+                            ItemGet.AddXP(800)
+                        else:
+                            ItemGet.AddXP(100)
+                        click(GetM)
+                    else:
+                        xp5k=get_xy('item/xp/5000.png',"獲得xp 5000",Mode=SelectMode)    
+                        if xp5k:
+                            ItemGet.AddXP(5000,Type_D='5KCount')
                             click(GetM)
                         else:
-                            xp5k=get_xy('item/xp/5000.png',"獲得xp 5000",Mode=SelectMode)    
-                            if xp5k:
-                                ItemGet.AddXP(5000,Type_D='5KCount')
+                            xp1w=get_xy('item/xp/10000.png',"獲得xp 10000",Mode=SelectMode)    
+                            if xp1w:
+                                ItemGet.AddXP(10000)
                                 click(GetM)
                             else:
-                                xp1w=get_xy('item/xp/10000.png',"獲得xp 10000",Mode=SelectMode)    
-                                if xp1w:
-                                    ItemGet.AddXP(10000)
-                                    click(GetM)
-                                else:
-                                    xp3w=get_xy('item/xp/30000.png',"獲得xp 30000",Mode=SelectMode)    
-                                    if xp3w:
-                                        ItemGet.AddXP(30000,Type_D='3WCount')    
-                                    xp5w=get_xy('item/xp/50000.png',"獲得xp 50000",Mode=SelectMode)    
-                                    if xp5w:
-                                        ItemGet.AddXP(50000,Type_D='5WCount')
+                                xp3w=get_xy('item/xp/30000.png',"獲得xp 30000",Mode=SelectMode)    
+                                if xp3w:
+                                    ItemGet.AddXP(30000,Type_D='3WCount')    
+                                xp5w=get_xy('item/xp/50000.png',"獲得xp 50000",Mode=SelectMode)    
+                                if xp5w:
+                                    ItemGet.AddXP(50000,Type_D='5WCount')
 
-                                    Next=get_xy("Select\\Next.png","下一步",Mode=SelectMode)
-                                    if Next:
-                                        click(Next,30)
+                                Next=get_xy("Select\\Next.png","下一步",Mode=SelectMode)
+                                if Next:
+                                    click(Next,30)
 
             Back=get_xy("Back.png","回來了",Mode=SelectMode)
             if Back:
