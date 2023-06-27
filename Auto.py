@@ -13,7 +13,7 @@ from CatFeed import *
 ProjectPath=os.path.dirname(os.path.abspath(__file__))
 print('Project >>',ProjectPath)
 
-WebFile="H:/NuclearWeb/Status.json"
+WebFile="H:/RTMP_2/TStatus.json"
 """用於指定任意位置存放統計結果"""
 
 SearchWin="雷電模擬器"
@@ -110,7 +110,7 @@ KeyCount={
 
 Region=None #查找位置
 CaptureNum=0 #第幾張圖
-MaxCaptureNum=6000 #最大存儲1000張圖
+MaxCaptureNum=100000 #最大存儲100000張圖
 
 HourCount=0
 
