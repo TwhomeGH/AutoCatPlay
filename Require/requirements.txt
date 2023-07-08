@@ -4,4 +4,4 @@ PyAutoGUI==0.9.53
 PyDirectInput==1.0.4
 pynput==1.7.6
 pywin32==306
-win32gui==221.6
+win32gui==221.5
